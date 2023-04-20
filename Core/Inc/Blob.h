@@ -8,7 +8,7 @@ struct Map;
 
 
 typedef enum {UP, DOWN, LEFT, RIGHT} Direction;
-typedef enum {BODY, FOOD, STONE} Type;
+typedef enum {EMPTY, BODY, FOOD, STONE} Type;
 struct Blob {
 	Direction dir;
 	Type type;
