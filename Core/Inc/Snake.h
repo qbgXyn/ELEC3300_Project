@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdint.h>
+#include "Blob.h"
 
 #ifndef SNAKE_H
 #define SNAKE_H
@@ -14,16 +15,16 @@ struct Snake {
 struct Snake* Snake(struct Map* map, uint8_t player_id, uint8_t x, uint8_t y, Direction dir, uint8_t length);
 
 
-void Move(struct Map* map, struct Snake* snake);
-void Grow(struct Map* map, struct Snake* snake);
-void Kill(struct Map* map, struct Snake* snake);
+void Snake_Update(struct Map* map, struct Snake* snake);
+void Snake_Grow(struct Map* map, struct Snake* snake);
+void Snake_Kill(struct Map* map, struct Snake* snake);
 
-void SetDirection(struct Snake* snake, Direction dir);
+void Snake_SetDirection(struct Snake* snake, Direction dir);
 
 
-struct Blob* GetHead(struct Snake* snake);
-uint8_t GetId(struct Snake* snake);
-uint8_t GetLength(struct Snake* snake);
+struct Blob* Snake_GetHead(struct Snake* snake);
+uint8_t Snake_GetId(struct Snake* snake);
+uint8_t Snake_GetLength(struct Snake* snake);
 
 
 #endif
