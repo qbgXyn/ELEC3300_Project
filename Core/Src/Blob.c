@@ -1,5 +1,4 @@
 #include "Blob.h"
-#include "Map.h"
 
 
 int get_Id(struct Blob* blob) {
@@ -7,7 +6,7 @@ int get_Id(struct Blob* blob) {
 }
 
 
-struct Blob* Blob(struct Map* map, uint8_t player_id, Direction dir, Type type, struct Blob* prev, struct Blob* next, uint8_t x, uint8_t y) {
+struct Blob* Blob(uint8_t player_id, Direction dir, Type type, struct Blob* prev, struct Blob* next, uint8_t x, uint8_t y) {
 	struct Blob* blob = malloc(sizeof(struct Blob));
 	blob->dir = dir;
 	blob->type = type;
@@ -16,8 +15,6 @@ struct Blob* Blob(struct Map* map, uint8_t player_id, Direction dir, Type type, 
 	blob->x = x;
 	blob->y = y;
 	blob->player_id = player_id;
-
-	map->map[x][y] = blob;
 
 	return blob;
 }

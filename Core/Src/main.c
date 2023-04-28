@@ -22,6 +22,11 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "lcd.h"
+#include "Blob.h"
+#include "Player.h"
+#include "Snake.h"
+#include "Game.h"
+#include "Map.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -84,13 +89,17 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   /* USER CODE BEGIN 2 */
-
+  struct Game* game = Game(1, 0);
+  Game_Start(game);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    Game_Update(game);
+    Game_Render(game);
+    HAL_Delay(1000/TICK);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
