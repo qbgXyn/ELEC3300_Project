@@ -1,12 +1,10 @@
+#ifndef PLAYER_H
+#define PLAYER_H
+
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include "Snake.h"
-
-#ifndef PLAYER_H
-#define PLAYER_H
-
-
 struct Map;
 
 
@@ -15,7 +13,6 @@ struct Player {
     struct Snake *snake;
     bool is_alive;
     bool buttonPressed[4];
-    bool is_AI;
     bool is_ready;
 } ;
 

@@ -8,7 +8,8 @@
 // create a new snake with given id and position (x, y) and direction
 struct Snake* Snake(struct Map* map, uint8_t player_id, uint8_t x, uint8_t y, Direction dir, uint8_t length) {
     struct Snake* snake = malloc(sizeof(struct Snake));
-    struct Blob* head = Blob(map, player_id, dir, BODY, NULL, NULL, x, y);
+    struct Blob* head = Blob(player_id, dir, BODY, NULL, NULL, x, y);
+    Set_Body(map, x, y, head);
     snake->head = head;
     snake->tail = head;
     for (int i = 1; i < length; i++) {
@@ -26,7 +27,8 @@ struct Snake* Snake(struct Map* map, uint8_t player_id, uint8_t x, uint8_t y, Di
                 x--;
                 break;
         }
-        struct Blob* blob = Blob(map, player_id, dir, BODY, snake->tail, NULL, x, y);
+        struct Blob* blob = Blob(player_id, dir, BODY, snake->tail, NULL, x, y);
+        Set_Body(map, x, y, blob);
         snake->tail->next = blob;
         snake->tail = blob;
         if (i == 1) {
@@ -64,45 +66,53 @@ void Snake_Update(struct Map* map, struct Snake* snake) {
             break;
     }
     if (x < 0 || x >= map->width || y < 0 || y >= map->height) {
-        Snake_Kill(map, snake);
+        Snake_Delete(map, snake);
         return;
     }
     if (Is_Empty(map, x, y) == false) {
         if (Is_Stone(map, x, y) || Is_Body(map, x, y)) {
-            Snake_Kill(map, snake);
+            Snake_Delete(map, snake);
             return;
         }
         if(Is_Food(map, x, y)) {
-            Consume_Food(map, x, y);
+            ClearCell(map, x, y);
             eat = true;
         }
     }
-    struct Blob* new_head = Blob(map, head->player_id, head->dir, BODY, NULL, head, x, y);
+    struct Blob* new_head = Blob(head->player_id, head->dir, BODY, NULL, head, x, y);
+    Set_Body(map, x, y, new_head);
     head->prev = new_head;
     snake->head = new_head;
     if (eat == false) {
-        map->map[tail->x][tail->y] = NULL;
-        snake->tail = snake->tail->prev;
-        snake->tail->next = NULL;
-        free(tail);
+        Snake_Remove_Tail(map, snake);
     }
 }
 
 // when a snake hit the wall or itself, call this function, and remove the snake from the game
-void Snake_Kill(struct Map* map, struct Snake* snake) {
+void Snake_Delete(struct Map* map, struct Snake* snake) {
+    if (snake == NULL) return;
     struct Blob* blob = snake->head;
     while (blob != NULL) {
         struct Blob* next = blob->next;
-        map->map[blob->x][blob->y] = NULL;
-        free(blob);
+        ClearCell(map, blob->x, blob->y);
         blob = next;
     }
     free(snake);
 }
 
+void Snake_Remove_Tail(struct Map* map, struct Snake* snake) {
+    if (snake == NULL) return;
+    struct Blob* tail = snake->tail;
+    snake->tail = snake->tail->prev;
+    ClearCell(map, tail->next->x, tail->next->y);
+    snake->tail->next = NULL;
+}
+
 // change the direction of the snake
 void Snake_SetDirection(struct Snake* snake, Direction dir) {
-    snake->head->dir = dir;
+    if (dir != snake->head->dir && dir != Opposite_Direction(snake->head->dir)) {
+        snake->head->dir = dir;
+    }
 }
 
 // get the snake's head
@@ -125,4 +135,19 @@ uint8_t Snake_GetLength(struct Snake* snake) {
         blob = blob->next;
     }
     return length;
+}
+
+
+Direction Opposite_Direction(Direction dir) {
+    switch (dir) {
+        case UP:
+            return DOWN;
+        case DOWN:
+            return UP;
+        case LEFT:
+            return RIGHT;
+        case RIGHT:
+            return LEFT;
+    }
+    return UP;
 }
