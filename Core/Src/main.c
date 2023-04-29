@@ -127,7 +127,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
     LCD_INIT();
     LCD_DrawBackgroundImage();
-    LCD_DrawMenu();  
+    LCD_DrawMenu();
     struct Game* game = Game(1, 0);
     Game_Start(game);
   /* USER CODE END 2 */
@@ -136,9 +136,9 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    Game_Update(game);
-    Game_Render(game);
-    HAL_Delay(1000/TICK);
+//    Game_Update(game);
+//    Game_Render(game);
+//    HAL_Delay(1000/TICK);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -262,7 +262,6 @@ static void MX_GPIO_Init(void)
   HAL_NVIC_SetPriority(EXTI0_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(EXTI0_IRQn);
 
-  // K2
   HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 

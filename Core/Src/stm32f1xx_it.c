@@ -24,7 +24,7 @@
 #include "stdint.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-// #include "GUI.h"
+#include "GUI.h"
 #include "lcd.h"
 /* USER CODE END Includes */
 
@@ -86,7 +86,6 @@ void NMI_Handler(void)
   /* USER CODE BEGIN NonMaskableInt_IRQn 1 */
   while (1)
   {
-    
   }
   /* USER CODE END NonMaskableInt_IRQn 1 */
 }
