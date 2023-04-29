@@ -24,7 +24,7 @@
 #include "stdint.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "GUI.h"
+// #include "GUI.h"
 #include "lcd.h"
 /* USER CODE END Includes */
 
