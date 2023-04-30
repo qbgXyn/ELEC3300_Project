@@ -3,7 +3,7 @@
 
 #include <stdlib.h>
 #include <stdint.h>
-#include "Blob.h"
+#include "Game/Blob.h"
 
 struct Map;
 
@@ -20,6 +20,8 @@ void Snake_Grow(struct Map* map, struct Snake* snake);
 void Snake_Delete(struct Map* map, struct Snake* snake);
 
 void Snake_SetDirection(struct Snake* snake, Direction dir);
+
+void Snake_Remove_Tail(struct Map* map, struct Snake* snake);
 
 
 struct Blob* Snake_GetHead(struct Snake* snake);

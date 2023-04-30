@@ -1,15 +1,16 @@
-#include "Game.h"
+#include "Game/Game.h"
 #include <stdio.h>
-#include "Map.h"
-#include "Game_Data.h"
-#include "Player.h"
+#include "Game/Map.h"
+#include "Game/Game_Data.h"
+#include "Game/Player.h"
 #include "internal_map.h"
+#include <string.h>
 
-// init map is NULL first, set map name "Random"
+// init map is NULL first, set map name "Unknown"
 struct Game* Game(int player_count, int local_player_id) {
     struct Game* game = (struct Game*)malloc(sizeof(struct Game));
     game->map = NULL;
-    game->map_name = "Random";
+    game->map_name = "Unknown";
     game->map_height = MAP_HEIGHT;
     game->map_width = MAP_WIDTH;
     game->food_spawn_interval = DEFAULT_FOOD_SPAWN_INTERVAL;
@@ -24,10 +25,7 @@ struct Game* Game(int player_count, int local_player_id) {
 void Game_Update(struct Game* game) {
     if (game->is_running) {
         for (int i = 0; i < game->player_count; i++) {
-            if (Is_Alive(game->player_list[i])) {
-                Game_Handle_Input(game);
-                Snake_Update(game->map, game->player_list[i]->snake);
-            }
+            Player_Update(game->map, game->player_list[i]);
         }
     }
 }
@@ -44,26 +42,6 @@ void Game_Render(struct Game* game) {
     }
 }  
 
-void Game_Handle_Input(struct Game* game) {
-    if (game->is_running) {
-        for (int i = 0; i < game->player_count; i++) {
-            if (Is_Alive(game->player_list[i])) {
-                if (game->player_list[i]->buttonPressed[UP]) {
-                    Snake_SetDirection(game->player_list[i]->snake, UP);
-                }
-                else if (game->player_list[i]->buttonPressed[DOWN]) {
-                    Snake_SetDirection(game->player_list[i]->snake, DOWN);
-                }
-                else if (game->player_list[i]->buttonPressed[LEFT]) {
-                    Snake_SetDirection(game->player_list[i]->snake, LEFT);
-                }
-                else if (game->player_list[i]->buttonPressed[RIGHT]) {
-                    Snake_SetDirection(game->player_list[i]->snake, RIGHT);
-                }
-            }
-        }
-    }
-}
 
 void Game_Start(struct Game* game) {
     game->is_running = true;
@@ -105,19 +83,11 @@ bool LoadMap(struct Game* game, char* map_name) {
     }
     fscanf(file, "%d", &game->food_spawn_interval);
     game->map = Map(game->map_width, game->map_height);
-    for (int i = 0; i < game->map_height; i++) {
-        for (int j = 0; j < game->map_width; j++) {
-            int type;
-            fscanf(file, "%d", &type);
-            if (type == FOOD) {
-                Set_Food(game->map, j, i);
-            }
-            else if (type == STONE) {
-                Set_Stone(game->map, j, i);
-            }
-            else {
-                Set_Empty(game->map, j, i);
-            }
+    for(int x = 0; x < game->map_width; x++) {
+        for(int y = 0; y < game->map_height; y++) {
+            int data;
+            fscanf(file, "%d", &data);
+            LoadDataToMap(game, x, y, data);
         }
     }
     fclose(file);
@@ -143,16 +113,33 @@ bool LoadMap(struct Game* game, char* map_name) {
 bool LoadInternalMap(struct Game* game, char* map_name) {
     if (strcmp(map_name, "classic") == 0) {
         game->map = Map(game->map_width, game->map_height);
-        for (int i = 0; i < game->map_height; i++) {
-            for (int j = 0; j < game->map_width; j++) {
-                if (classic[i][j] == STONE) {
-                    Set_Stone(game->map, j, i);
-                }
-                else {
-                    Set_Empty(game->map, j, i);
-                }
+        for(int x = 0; x < game->map_width; x++) {
+            for(int y = 0; y < game->map_height; y++) {
+                LoadDataToMap(game, x, y, internal_map_classic[x][y]);
             }
         }
     }
+}
 
+// stone_rate: for every cell, it has 1/stone_rate chance to be a stone
+bool LoadRandomMap(struct Game* game, int stone_rate) {
+    game->map = Map(game->map_width, game->map_height);
+    for(int x = 0; x < game->map_width; x++) {
+        for(int y = 0; y < game->map_height; y++) {
+            int data = rand() % stone_rate == 0 ? STONE : EMPTY;
+            LoadDataToMap(game, x, y, data);
+        }
+    }
+}
+
+void LoadDataToMap(struct Game* game, int x, int y, int data) {
+    if (data == FOOD) {
+        Set_Food(game->map, x, y);
+    }
+    else if (data == STONE) {
+        Set_Stone(game->map, x, y);
+    }
+    else {
+        Set_Empty(game->map, x, y);
+    }
 }

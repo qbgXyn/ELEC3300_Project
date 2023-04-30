@@ -1,6 +1,6 @@
-#include "Map.h"
-#include "Blob.h"
-#include "Snake.h"
+#include "Game/Map.h"
+#include "Game/Blob.h"
+#include "Game/Snake.h"
 #include <stdlib.h>
 #include <stdbool.h>
 
@@ -47,7 +47,6 @@ struct Snake* Snake(struct Map* map, uint8_t player_id, uint8_t x, uint8_t y, Di
 // if the snake eats food, do not delete the tail(that way, the length grows by 1). if not, delete the tail
 void Snake_Update(struct Map* map, struct Snake* snake) {
     struct Blob* head = snake->head;
-    struct Blob* tail = snake->tail;
     uint8_t x = head->x;
     uint8_t y = head->y;
     bool eat = false;
@@ -88,7 +87,7 @@ void Snake_Update(struct Map* map, struct Snake* snake) {
     }
 }
 
-// when a snake hit the wall or itself, call this function, and remove the snake from the game
+// when a snake hit the wall or itself, call this function, will remove the snake from the game
 void Snake_Delete(struct Map* map, struct Snake* snake) {
     if (snake == NULL) return;
     struct Blob* blob = snake->head;

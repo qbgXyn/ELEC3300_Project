@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
-#include "Snake.h"
+#include "Game/Snake.h"
 struct Map;
 
 
@@ -25,6 +25,8 @@ void Signal_Input(struct Player* player, Direction dir);
 void Signal_Receive(struct Player* player, Direction dir);
 
 bool Is_Alive(struct Player* player);
+
+void Player_Update(struct Map* map, struct Player* player);
 
 
 #endif

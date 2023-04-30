@@ -1,8 +1,0 @@
-#ifndef GAME_DATA_H
-#define GAME_DATA_H
-
-#define MAP_WIDTH 40
-#define MAP_HEIGHT 40
-#define DEFAULT_FOOD_SPAWN_INTERVAL 3000
-
-#endif

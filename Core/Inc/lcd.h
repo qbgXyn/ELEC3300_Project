@@ -57,41 +57,21 @@ void            LCD_BackLed_Control	( FunctionalState enumState );
 void            LCD_Write_Cmd		( uint16_t usCmd );
 void            LCD_Write_Data		( uint16_t usData );
 uint16_t        LCD_Read_Data		( void );
-void		LCD_FillColor		( uint32_t usPoint, uint16_t usColor );
+void		    LCD_FillColor		( uint32_t usPoint, uint16_t usColor );
 void            LCD_OpenWindow		( uint16_t usC, uint16_t usP, uint16_t usWidth, uint16_t usHeight );
 void            LCD_Clear		( uint16_t usC, uint16_t usP, uint16_t usWidth, uint16_t usHeight, uint16_t usColor );
 uint16_t        LCD_GetPointPixel	( uint16_t usC , uint16_t usP );
 void            LCD_DrawLine		( uint16_t usC1, uint16_t usP1, uint16_t usC2, uint16_t usP2, uint16_t usColor );
 void            LCD_DrawChar		( uint16_t usC, uint16_t usP, const char cChar);
+void            LCD_DrawCharWithBGColor ( uint16_t usC, uint16_t usP, const char cChar, uint16_t usColor);
+void            LCD_DrawCharTranslucent ( uint16_t usC, uint16_t usP, const char cChar, uint16_t usColor);
 void            LCD_DrawString		( uint16_t usC, uint16_t usP, const char * pStr);
 void            LCD_DrawDot		( uint16_t usC, uint16_t usP, uint16_t usColor );
-void 		LCD_DrawEllipse		( uint16_t usC, uint16_t usP, uint16_t SR, uint16_t LR, uint16_t usColor);
+void 		    LCD_DrawEllipse		( uint16_t usC, uint16_t usP, uint16_t SR, uint16_t LR, uint16_t usColor);
+void            LCD_DrawRectangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color);
 
-// ELEC3300 - Project
-void LCD_DrawArrow(uint8_t menuItem);
-void LCD_ClearArrow(uint8_t menuItem);
 
-#define MENU_ITEM_COUNT 3
-#define SUBMENU_ITEM_COUNT 3
 
-// Add an enumeration to represent the current interface
-typedef enum {
-    MAIN_MENU,
-    DIFFICULTY_MENU,
-    MAP_MENU,
-    PLAYERS_MENU,
-	HIGH_SCORES_MENU,
-	START_GAME,
-	IN_GAME
-} MenuState;
-
-// Scroll down to select the item in the GUI
-void LCD_DrawSubmenu(uint8_t submenuIndex);
-void LCD_ClearSubmenuArrow(uint8_t submenuIndex);
-void LCD_DrawSubmenuArrow(uint8_t submenuIndex);
-
-// Generate Map
-void GenerateGameMap(uint8_t difficulty, uint8_t map, uint8_t players);
 
 // Color
 #define LCD_COLOR_WHITE 0xFFFF
@@ -101,7 +81,6 @@ void GenerateGameMap(uint8_t difficulty, uint8_t map, uint8_t players);
 #define LCD_COLOR_BLACK 0x0000
 
 void LCD_Fill(uint16_t usCOLUMN, uint16_t usPAGE, uint16_t usWidth, uint16_t usHeight, uint16_t usColor);
-void LCD_DrawBackgroundImage();
 
 // Handling the map square and score position
 #define GRID_SIZE_X 12

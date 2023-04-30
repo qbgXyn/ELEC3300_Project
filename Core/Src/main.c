@@ -24,11 +24,14 @@
 #include "lcd.h"
 #include "stdbool.h"
 #include "stdio.h"
-#include "Blob.h"
-#include "Player.h"
-#include "Snake.h"
-#include "Game.h"
-#include "Map.h"
+#include "Game/Blob.h"
+#include "Game/Player.h"
+#include "Game/Snake.h"
+#include "Game/Game.h"
+#include "Game/Map.h"
+#include "GUI/Menu.h"
+#include "GUI/bg.h"
+#include "internal_bg.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -64,33 +67,23 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-uint8_t selected_menu_item = 0;
-uint8_t menuItemSelected = 0;
-uint8_t selectedDifficulty = 1;
+
 uint8_t selectedMap = 1;
 uint8_t selectedPlayers = 1;
-// uint8_t currentMenuItem = 0;
 
-void LCD_ClearArrow(uint8_t menuItem) {
-	// Clear the arrow symbol ">" in front of the last selected menu item
-    uint16_t arrow_y = 60 + menuItem * 30;
-    LCD_DrawString(20, arrow_y, " ");
-}
+int highScore = 0; // for player on this device only
 
-void DrawMenuItem(uint8_t menuItem) {
-	// Clear the arrow symbol ">" in front of the last selected menu item
-    LCD_ClearArrow(currentMenuItem);
-    // Update the currently selected menu item
-    currentMenuItem = menuItem;
-    // Add the arrow symbol ">" in front of the newly selected menu item
-    LCD_DrawArrow(currentMenuItem);
-}
+uint8_t player1Score = 0;
+uint8_t player2Score = 0;
 
-void LCD_DrawArrow(uint8_t menuItem)
-{	// Add the arrow symbol ">" in front of the current selected menu item
-    uint16_t arrow_y = 60 + menuItem * 30;
-    LCD_DrawString(20, arrow_y, ">");
-}
+int random_map_difficulty = 20; // 1/random_map_difficulty chance of a cell to be a stone
+
+extern uint8_t menuItemCount;
+extern MenuState menuState;
+extern uint8_t currentMenuItem;
+
+
+
 
 /* USER CODE END 0 */
 
@@ -101,7 +94,6 @@ void LCD_DrawArrow(uint8_t menuItem)
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -126,9 +118,10 @@ int main(void)
   MX_CRC_Init();
   /* USER CODE BEGIN 2 */
     LCD_INIT();
-    LCD_DrawBackgroundImage();
-    LCD_DrawMenu();
+    BG_DrawBackground(main_menu);
+    MENU_SwitchMenu(MAIN_MENU);
     struct Game* game = Game(1, 0);
+    
     Game_Start(game);
   /* USER CODE END 2 */
 

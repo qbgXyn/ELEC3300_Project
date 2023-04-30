@@ -1,6 +1,7 @@
-#include "Map.h"
-#include "Blob.h"
+#include "Game/Map.h"
+#include "Game/Blob.h"
 #include <stdlib.h>
+#include <string.h>
 
 
 
@@ -24,7 +25,7 @@ struct Map* Map(uint8_t height, uint8_t width) {
 void Spawn_Food_Randomly(struct Map* map) {
     uint8_t x = rand() % map->width;
     uint8_t y = rand() % map->height;
-    while (map->map_data[x][y] != NULL) {
+    while (Is_Empty(map, x, y) == false) {
         x = rand() % map->width;
         y = rand() % map->height;
     }
@@ -34,7 +35,7 @@ void Spawn_Food_Randomly(struct Map* map) {
 void Spawn_Stone_Randomly(struct Map* map) {
     uint8_t x = rand() % map->width;
     uint8_t y = rand() % map->height;
-    while (map->map_data[x][y] != NULL) {
+    while (Is_Empty(map, x, y) == false) {
         x = rand() % map->width;
         y = rand() % map->height;
     }
@@ -87,7 +88,7 @@ bool Is_Empty(struct Map* map, uint8_t x, uint8_t y) {
 }
 
 
-// remove all non-snake blobs
+// remove all blobs
 void ClearMap(struct Map* map) {
     for (int x = 0; x < map->width; ++x) {
         for (int y = 0; y < map->height; ++y) {
@@ -97,6 +98,7 @@ void ClearMap(struct Map* map) {
     }
 }
 
+// remember to clear all snakes before deleting map
 void Map_Delete(struct Map* map) {
     ClearMap(map);
     for (int i = 0; i < map->width; ++i) {
@@ -107,7 +109,7 @@ void Map_Delete(struct Map* map) {
 }
 
 void ClearCell(struct Map* map, uint8_t x, uint8_t y) {
-    if (Is_Empty(map, x, y) == false && Is_Body(map, x, y) == false) {
+    if (Is_Empty(map, x, y) == false) {
         free(map->map_data[x][y]);
         map->map_data[x][y] = NULL;
         map->map_differ[x + y*map->width] = true;

@@ -1,4 +1,4 @@
-#include "Player.h"
+#include "Game/Player.h"
 
 
 struct Player* Player(){
@@ -23,14 +23,14 @@ bool Is_Alive(struct Player* player) {
 }
 
 void Player_Update(struct Map* map, struct Player* player) {
+    if (Is_Alive(player) == false) return;
+    
     for(int i = 0; i < 4; i++) {
         if(player->buttonPressed[i]) {
             Snake_SetDirection(player->snake, i);
         }
     }
-    if (Is_Alive(player)) {
-        Snake_Update(map, player->snake);
-    }
+    Snake_Update(map, player->snake);
 }
 
 void Player_Delete(struct Map* map, struct Player* player) {
