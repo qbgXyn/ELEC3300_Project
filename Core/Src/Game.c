@@ -4,6 +4,7 @@
 #include "Game_Data.h"
 #include "Player.h"
 #include "internal_map.h"
+#include <string.h>
 
 // init map is NULL first, set map name "Random"
 struct Game* Game(int player_count, int local_player_id) {

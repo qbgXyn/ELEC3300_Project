@@ -47,7 +47,6 @@ struct Snake* Snake(struct Map* map, uint8_t player_id, uint8_t x, uint8_t y, Di
 // if the snake eats food, do not delete the tail(that way, the length grows by 1). if not, delete the tail
 void Snake_Update(struct Map* map, struct Snake* snake) {
     struct Blob* head = snake->head;
-    struct Blob* tail = snake->tail;
     uint8_t x = head->x;
     uint8_t y = head->y;
     bool eat = false;

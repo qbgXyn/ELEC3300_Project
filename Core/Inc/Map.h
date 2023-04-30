@@ -52,6 +52,8 @@ void Spawn_Stone_Randomly(struct Map* map);
 
 void Set_Food(struct Map* map, uint8_t x, uint8_t y);
 void Set_Stone(struct Map* map, uint8_t x, uint8_t y);
+void Set_Empty(struct Map* map, uint8_t x, uint8_t y);
+void Set_Body(struct Map* map, uint8_t x, uint8_t y, struct Blob* blob);
 
 bool Is_Food(struct Map* map, uint8_t x, uint8_t y);
 bool Is_Stone(struct Map* map, uint8_t x, uint8_t y);
