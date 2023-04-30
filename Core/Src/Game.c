@@ -105,19 +105,11 @@ bool LoadMap(struct Game* game, char* map_name) {
     }
     fscanf(file, "%d", &game->food_spawn_interval);
     game->map = Map(game->map_width, game->map_height);
-    for (int i = 0; i < game->map_height; i++) {
-        for (int j = 0; j < game->map_width; j++) {
-            int type;
-            fscanf(file, "%d", &type);
-            if (type == FOOD) {
-                Set_Food(game->map, j, i);
-            }
-            else if (type == STONE) {
-                Set_Stone(game->map, j, i);
-            }
-            else {
-                Set_Empty(game->map, j, i);
-            }
+    for(int x = 0; x < game->map_width; x++) {
+        for(int y = 0; y < game->map_height; y++) {
+            int data;
+            fscanf(file, "%d", &data);
+            LoadDataToMap(game, x, y, data);
         }
     }
     fclose(file);
@@ -143,16 +135,23 @@ bool LoadMap(struct Game* game, char* map_name) {
 bool LoadInternalMap(struct Game* game, char* map_name) {
     if (strcmp(map_name, "classic") == 0) {
         game->map = Map(game->map_width, game->map_height);
-        for (int i = 0; i < game->map_height; i++) {
-            for (int j = 0; j < game->map_width; j++) {
-                if (classic[i][j] == STONE) {
-                    Set_Stone(game->map, j, i);
-                }
-                else {
-                    Set_Empty(game->map, j, i);
-                }
+        for(int x = 0; x < game->map_width; x++) {
+            for(int y = 0; y < game->map_height; y++) {
+                LoadDataToMap(game, x, y, internal_map_classic[x][y]);
             }
         }
     }
+}
 
+
+void LoadDataToMap(struct Game* game, int x, int y, int data) {
+    if (data == FOOD) {
+        Set_Food(game->map, x, y);
+    }
+    else if (data == STONE) {
+        Set_Stone(game->map, x, y);
+    }
+    else {
+        Set_Empty(game->map, x, y);
+    }
 }

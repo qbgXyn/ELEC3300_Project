@@ -1,6 +1,7 @@
 #include "Map.h"
 #include "Blob.h"
 #include <stdlib.h>
+#include <string.h>
 
 
 
