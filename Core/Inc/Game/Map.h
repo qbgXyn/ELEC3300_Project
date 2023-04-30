@@ -4,8 +4,8 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
-#include "Blob.h"
-#include "Game_Data.h"
+#include "Game/Blob.h"
+#include "Game/Game_Data.h"
 
 
 /*

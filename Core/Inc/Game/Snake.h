@@ -3,7 +3,7 @@
 
 #include <stdlib.h>
 #include <stdint.h>
-#include "Blob.h"
+#include "Game/Blob.h"
 
 struct Map;
 

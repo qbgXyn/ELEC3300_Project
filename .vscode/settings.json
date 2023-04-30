@@ -1,6 +1,14 @@
 {
     "files.associations": {
         "game_data.h": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "game.h": "c",
+        "map.h": "c",
+        "player.h": "c",
+        "internal_map.h": "c",
+        "blob.h": "c",
+        "snake.h": "c",
+        "string.h": "c",
+        "menu.h": "c"
     }
 }

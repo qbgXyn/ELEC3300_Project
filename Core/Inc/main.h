@@ -68,7 +68,6 @@ void Error_Handler(void);
 #define LCD_RST_Pin GPIO_PIN_1
 #define LCD_RST_GPIO_Port GPIOE
 /* USER CODE BEGIN Private defines */
-extern uint8_t currentMenuItem;
 //#define MENU_ITEM_COUNT 4
 
 /* USER CODE END Private defines */

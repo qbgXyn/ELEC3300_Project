@@ -4,8 +4,8 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
-#include <Player.h>
-#include "Game_Data.h"
+#include "Game/Player.h"
+#include "Game/Game_Data.h"
 
 
 
@@ -36,8 +36,6 @@ void Game_Update(struct Game* game);
 
 void Game_Render(struct Game* game);
 
-void Game_Handle_Input(struct Game* game);
-
 void Game_Start(struct Game* game);
 
 void Game_Destroy(struct Game* game);
@@ -48,6 +46,7 @@ void Game_Remove_Player(struct Game* game, struct Player* player);
 
 
 bool LoadMap(struct Game* game, char* map_name);
+bool LoadRandomMap(struct Game* game, int stone_rate);
 bool LoadInternalMap(struct Game* game, char* map_name);
 
 //private

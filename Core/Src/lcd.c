@@ -3,29 +3,12 @@
 #include "stdint.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include "internal_bg.h"
 #include <string.h>
-
-
-extern uint8_t selectedDifficulty;
-extern uint8_t selectedMap;
-extern uint8_t selectedPlayers;
-
 
 void		LCD_REG_Config          ( void );
 void		LCD_FillColor           ( uint32_t ulAmout_Point, uint16_t usColor );
 uint16_t	LCD_Read_PixelData      ( void );
-void LCD_DrawRectangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color);
-int player1HighScore = 0;
-int player2HighScore = 0;
-void initMap(uint8_t difficulty);
-void drawMap(uint8_t mapStyle);
-void LCD_DrawForest();
-void LCD_DrawDesert();
-void LCD_DrawCity();
 
-
-uint8_t currentMenuItem = 0;
 void LCD_WriteArea(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t *buffer);
 void LCD_ReadArea(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t *buffer);
 
@@ -394,6 +377,59 @@ void LCD_DrawChar ( uint16_t usC, uint16_t usP, const char cChar )
 
 }
 
+void LCD_DrawCharWithBGColor ( uint16_t usC, uint16_t usP, const char cChar, uint16_t usColor)
+{
+	uint8_t ucTemp, ucRelativePositon, ucPage, ucColumn;
+
+
+	ucRelativePositon = cChar - ' ';
+
+	LCD_OpenWindow ( usC, usP, WIDTH_EN_CHAR, HEIGHT_EN_CHAR );
+
+	LCD_Write_Cmd ( CMD_SetPixel );
+
+	for ( ucPage = 0; ucPage < HEIGHT_EN_CHAR; ucPage ++ )
+	{
+		ucTemp = ucAscii_1608 [ ucRelativePositon ] [ ucPage ];
+
+		for ( ucColumn = 0; ucColumn < WIDTH_EN_CHAR; ucColumn ++ )
+		{
+			if ( ucTemp & 0x01 )
+				LCD_Write_Data ( 0x001F );
+
+			else
+				LCD_Write_Data (  usColor );
+
+			ucTemp >>= 1;
+
+		}
+
+	}
+
+}
+
+
+void LCD_DrawCharTranslucent ( uint16_t usC, uint16_t usP, const char cChar, uint16_t usColor)
+{
+	uint8_t ucTemp, ucRelativePositon, ucPage, ucColumn;
+
+	ucRelativePositon = cChar - ' ';
+
+	for ( ucPage = 0; ucPage < HEIGHT_EN_CHAR; ucPage ++ )
+	{
+		ucTemp = ucAscii_1608 [ ucRelativePositon ] [ ucPage ];
+
+		for ( ucColumn = 0; ucColumn < WIDTH_EN_CHAR; ucColumn ++ )
+		{
+			if ( ucTemp & 0x01 )
+				LCD_DrawDot (ucColumn, ucPage, 0x001F);
+			ucTemp >>= 1;
+		}
+
+	}
+
+}
+
 
 void LCD_DrawString ( uint16_t usC, uint16_t usP, const char * pStr )
 {
@@ -428,92 +464,7 @@ void LCD_DrawDot(uint16_t usCOLUMN, uint16_t usPAGE, uint16_t usColor)
 		
 }
 
-void LCD_DrawBackgroundImage()
-{
-    uint16_t x, y;
-    uint16_t width = 240; // Width
-    uint16_t height = 320; // Height
 
-    LCD_OpenWindow(0, 0, width, height);
-    LCD_Write_Cmd(CMD_SetPixel);
-
-    for (y = 0; y < height; y++)
-    {
-        for (x = 0; x < width; x++)
-        {
-            LCD_Write_Data(main_menu[y * width + x]);
-        }
-    }
-}
-
-
-
-void LCD_DrawMenu(void)
-{
-    //LCD_Clear(0, 0, 240, 320, 0); // Clear LCD
-	// Draw title and option text
-    LCD_DrawBackgroundImage();
-    LCD_DrawString(60, 10, "Snake Game");
-    LCD_DrawString(40, 60, "1. Choose difficulty");
-    LCD_DrawString(40, 90, "2. Choose map");
-    LCD_DrawString(40, 120, "3. Choose player(s) (1-2)");
-    LCD_DrawString(40, 150, "4. High scores");
-    LCD_DrawString(40, 180, "5. Start game");
-
-    // Shows the selected game difficulty, map and number of players
-    char buffer[32];
-
-    // Difficulty
-    switch (selectedDifficulty)
-    {
-        case 1:
-            strcpy(buffer, "Difficulty: Easy");
-            break;
-        case 2:
-            strcpy(buffer, "Difficulty: Medium");
-            break;
-        case 3:
-            strcpy(buffer, "Difficulty: Hard");
-            break;
-        default:
-            strcpy(buffer, "Difficulty: Unknown");
-            break;
-    }
-    LCD_DrawString(40, 210, buffer);
-
-    // Map
-    switch (selectedMap)
-    {
-        case 1:
-            strcpy(buffer, "Map: Forest");
-            break;
-        case 2:
-            strcpy(buffer, "Map: Desert");
-            break;
-        case 3:
-            strcpy(buffer, "Map: Empty");
-            break;
-        default:
-            strcpy(buffer, "Map: Unknown");
-            break;
-    }
-    LCD_DrawString(40, 240, buffer);
-
-    // Players
-    switch (selectedPlayers)
-    {
-        case 1:
-            strcpy(buffer, "Player: 1");
-            break;
-        case 2:
-            strcpy(buffer, "Players: 2");
-            break;
-        default:
-            strcpy(buffer, "Players: Unknown");
-            break;
-    }
-    LCD_DrawString(40, 270, buffer);
-}
 
 void LCD_DrawRectangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color)
 {
@@ -523,45 +474,6 @@ void LCD_DrawRectangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint1
     LCD_DrawLine(x2, y1, x2, y2, color);
 }
 
-void LCD_DrawSubmenu(uint8_t submenuIndex) {
-    //LCD_Clear(0, 0, 240, 320, 0); // Clear LCD
-    LCD_DrawBackgroundImage();
-    char buffer[32]; // Define the buffer array inside the function
-    switch (submenuIndex) {
-        case 1: // Choose difficulty
-            LCD_DrawString(40, 60, "1. Easy");
-            LCD_DrawString(40, 90, "2. Medium");
-            LCD_DrawString(40, 120, "3. Hard");
-            LCD_DrawSubmenuArrow(0);
-            break;
-        case 2: // Choose map
-            LCD_DrawString(40, 60, "1. Map: Forest");
-            LCD_DrawString(40, 90, "2. Map: Desert");
-            LCD_DrawString(40, 120, "3. Map: Empty");
-            LCD_DrawSubmenuArrow(0);
-            break;
-        case 3: // Choose players
-            LCD_DrawString(40, 60, "1. 1 Player");
-            LCD_DrawString(40, 90, "2. 2 Players");
-            LCD_DrawSubmenuArrow(0);
-            break;
-        case 4: // High scores
-            LCD_DrawString(40, 60, "High Scores:");
-            snprintf(buffer, sizeof(buffer), "P1 High Score: %d", player1HighScore);
-            LCD_DrawString(40, 90, buffer);
-            if (selectedPlayers == 2) {
-                snprintf(buffer, sizeof(buffer), "P2 High Score: %d", player2HighScore);
-                LCD_DrawString(40, 120, buffer);
-            }
-            break;
-        default:
-            break;
-    }
-}
-
-uint8_t gameMap[GRID_SIZE_X][GRID_SIZE_Y];
-uint8_t player1Score = 0;
-uint8_t player2Score = 0;
 
 void LCD_Fill(uint16_t usCOLUMN, uint16_t usPAGE, uint16_t usWidth, uint16_t usHeight, uint16_t usColor)
 {
@@ -569,85 +481,6 @@ void LCD_Fill(uint16_t usCOLUMN, uint16_t usPAGE, uint16_t usWidth, uint16_t usH
     LCD_FillColor(usWidth * usHeight, usColor);
 }
 
-void GenerateGameMap(uint8_t difficulty, uint8_t map, uint8_t players)
-{
-    // Clear LCD
-    // LCD_Clear(0, 0, 240, 320, 0);
-
-    // Draw the background according to the type of map chosen by the player
-    switch (map) {
-        case 1: // Forest Map
-            LCD_DrawForest();
-            break;
-        case 2: // City Map
-            LCD_DrawDesert();
-            break;
-        case 3:
-            LCD_Clear(0, 0, 240, 320, 0xFFFF);
-            break;
-        default:
-            // Handle any other cases if necessary
-            break;
-    }
-
-    // Show player score
-    char scoreBuffer[32];
-    snprintf(scoreBuffer, sizeof(scoreBuffer), "P1 Score: %d", player1Score);
-    LCD_DrawString(10, 2, scoreBuffer);
-
-    if (players == 2) {
-        snprintf(scoreBuffer, sizeof(scoreBuffer), "P2 Score: %d", player2Score);
-        LCD_DrawString(140, 2, scoreBuffer);
-    }
-
-    // Generate maps
-    srand(HAL_GetTick()); // Initialize the random number seed with the current system clock
-    for (uint8_t x = 0; x < GRID_SIZE_X; x++) {
-        for (uint8_t y = 0; y < GRID_SIZE_Y; y++) {
-        	// Initialize the random number seed with the current system clock
-            if ((rand() % 100) < (difficulty * 3)) {
-                gameMap[x][y] = 1;
-                LCD_Fill(x * BLOCK_SIZE, SCORE_AREA_HEIGHT + y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE, BLACK);
-            } else {
-                gameMap[x][y] = 0;
-                // Draw a black square border
-                LCD_DrawRectangle(x * BLOCK_SIZE, SCORE_AREA_HEIGHT + y * BLOCK_SIZE, (x * BLOCK_SIZE) + BLOCK_SIZE, (SCORE_AREA_HEIGHT + y * BLOCK_SIZE) + BLOCK_SIZE, BLACK);
-            }
-        }
-    }
-}
-
-// This function is mainly used to prompt the user for the K1 and K2 buttons in the game
-// The first time you click K1 or K2 in the game, an info box will be displayed.
-// and then
-// K1 - Reload Map
-// k2 - Main Menu
-int8_t ShowExitConfirmation() {
-		// Draw the game's prompt box
-	    LCD_DrawRectangle(SCREEN_CENTER_X - (CONFIRM_BOX_WIDTH / 2), SCREEN_CENTER_Y - (CONFIRM_BOX_HEIGHT / 2),
-	                      SCREEN_CENTER_X + (CONFIRM_BOX_WIDTH / 2), SCREEN_CENTER_Y + (CONFIRM_BOX_HEIGHT / 2), BLACK);
-	    LCD_Fill(SCREEN_CENTER_X - (CONFIRM_BOX_WIDTH / 2) + 1, SCREEN_CENTER_Y - (CONFIRM_BOX_HEIGHT / 2) + 1,
-	             CONFIRM_BOX_WIDTH - 2, CONFIRM_BOX_HEIGHT - 2, WHITE);
-
-	    // Display prompt text
-	    LCD_DrawString(SCREEN_CENTER_X - 60, SCREEN_CENTER_Y - 10, "K1: Reload Map");
-	    LCD_DrawString(SCREEN_CENTER_X - 60, SCREEN_CENTER_Y + 10, "K2: Main Menu");
-
-	    // Waiting for user input
-	    uint8_t exitConfirmed = 0;
-	    while (1) {
-	        if (HAL_GPIO_ReadPin(K1_GPIO_Port, K1_Pin) == GPIO_PIN_SET) {
-	            exitConfirmed = 1;
-	            break;
-	        }
-	        if (HAL_GPIO_ReadPin(K2_GPIO_Port, K2_Pin) == GPIO_PIN_SET) {
-	            exitConfirmed = 1;
-	            break;
-	        }
-	    }
-
-	    return exitConfirmed;
-}
 
 //uint16_t savedScreen[240][320];
 //void SaveScreen(void) {
@@ -666,74 +499,6 @@ int8_t ShowExitConfirmation() {
 //    }
 //}
 
-void LCD_ClearSubmenuArrow(uint8_t submenuIndex) {
-    uint16_t arrow_y = 60 + submenuIndex * 30;
-    LCD_DrawString(20, arrow_y, " ");
-}
-
-void LCD_DrawSubmenuArrow(uint8_t submenuIndex) {
-    uint16_t arrow_y = 60 + submenuIndex * 30;
-    LCD_DrawString(20, arrow_y, ">");
-}
 
 
-/////////////////////////////////////////////////////////////
-//														   //
-//														   //
-//														   //
-//    The following section is about the map background	   //
-//														   //
-//														   //
-//														   //
-/////////////////////////////////////////////////////////////
-void LCD_DrawForest()
-{
-    uint16_t x, y;
-    uint16_t width = 240; // Width
-    uint16_t height = 320; // Height
-    LCD_OpenWindow(0, 0, width, height);
-    LCD_Write_Cmd(CMD_SetPixel);
-
-    for (y = 0; y < height; y++)
-    {
-        for (x = 0; x < width; x++)
-        {
-            LCD_Write_Data(forest[y * width + x]);
-        }
-    }
-}
-void LCD_DrawDesert()
-{
-    uint16_t x, y;
-    uint16_t width = 240; // Width
-    uint16_t height = 320; // Height
-    LCD_OpenWindow(0, 0, width, height);
-    LCD_Write_Cmd(CMD_SetPixel);
-
-    for (y = 0; y < height; y++)
-    {
-        for (x = 0; x < width; x++)
-        {
-            LCD_Write_Data(desert[y * width + x]);
-        }
-    }
-}
-
-void LCD_DrawCity()
-{
-    uint16_t x, y;
-    uint16_t width = 240; // Width
-    uint16_t height = 320; // Height
-
-    LCD_OpenWindow(0, 0, width, height);
-    LCD_Write_Cmd(CMD_SetPixel);
-
-    for (y = 0; y < height; y++)
-    {
-        for (x = 0; x < width; x++)
-        {
-            LCD_Write_Data(city[y * width + x]);
-        }
-    }
-}
 

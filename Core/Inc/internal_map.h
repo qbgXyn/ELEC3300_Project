@@ -1,7 +1,7 @@
 #ifndef INTERNAL_MAP_H
 #define INTERNAL_MAP_H
 
-#include "Game_Data.h"
+#include "Game/Game_Data.h"
 
 
 int internal_map_classic[MAP_WIDTH][MAP_HEIGHT] = {
