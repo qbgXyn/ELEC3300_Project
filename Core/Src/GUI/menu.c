@@ -1,17 +1,23 @@
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
 #include "lcd.h"
 #include "GUI/menu.h"
 #include "GUI/bg.h"
 #include "internal_bg.h"
-#include <string.h>
-#include <stdlib.h>
+#include "internal_map.h"
+#include "Game/game.h"
+
 
 uint8_t menuItemCount = 0; // Number of menu items, dynamically updated when you call additem(), set to 0 when change menu
 MenuState menuState = MAIN_MENU;
 uint8_t currentMenuItemIndex = 0;
 
-extern uint8_t selectedMap;
+char menuItemNameList[8][32]; // List of menu item names, dynamically updated when you call additem(), set to 0 when change menu
+
 
 extern int highScore;
+extern struct Game* game;
 
 
 void MENU_DrawArrow(uint8_t menuItemIndex);
@@ -42,17 +48,21 @@ void MENU_SelectNextItem() {
 
 void MENU_AddItem(char* title) {
     LCD_DrawString(MENU_ITEM_X, MENU_ITEM_START_Y + menuItemCount * MENU_ITEM_DISTANCE, title);
+    strcpy(menuItemNameList[menuItemCount], title);
     ++menuItemCount;
 }
 
 void MENU_DrawSubMenu(uint8_t submenuIndex) {
     //LCD_Clear(0, 0, 240, 320, 0); // Clear LCD
-    BG_DrawBackground(main_menu);
+    BG_DrawBackground(BG_MAIN_MENU_DATA);
     switch (submenuIndex) {
         case MAP_MENU: // Choose map
-            MENU_AddItem("1. Random(Easy)");
-            MENU_AddItem("2. Random(Medium)");
-            MENU_AddItem("3. Random(Hard)");
+            MENU_AddItem(TEXT_RANDOM_MAP_EASY);
+            MENU_AddItem(TEXT_RANDOM_MAP_MEDIUM);
+            MENU_AddItem(TEXT_RANDOM_MAP_HARD);
+            MENU_AddItem(TEXT_CLASSIC);
+            MENU_AddItem(TEXT_FOREST);
+            MENU_AddItem(TEXT_DESERT);
             break;
         case ROOM_MENU: // Choose players
             MENU_AddItem("Waiting for player 2...");
@@ -66,7 +76,7 @@ void MENU_DrawMainMenu(void)
 {
     //LCD_Clear(0, 0, 240, 320, 0); // Clear LCD
 	// Draw title and option text
-    BG_DrawBackground(main_menu);
+    BG_DrawBackground(BG_MAIN_MENU_DATA);
     LCD_DrawString(60, 10, "Snake Game");
     MENU_AddItem("Single-player");
     MENU_AddItem("Multi-player");
@@ -76,21 +86,8 @@ void MENU_DrawMainMenu(void)
     char buffer[32];
 
     // Map
-    switch (selectedMap)
-    {
-        case 1:
-            strcpy(buffer, "Map: Forest");
-            break;
-        case 2:
-            strcpy(buffer, "Map: Desert");
-            break;
-        case 3:
-            strcpy(buffer, "Map: Empty");
-            break;
-        default:
-            strcpy(buffer, "Map: Unknown");
-            break;
-    }
+    strcpy(buffer, "Map: ");
+    strcat(buffer, game->map_name);
     LCD_DrawString(40, 240, buffer);
     memset(buffer, 0, sizeof(buffer));
     strcpy(buffer, "Highest score: ");
@@ -103,6 +100,7 @@ void MENU_SwitchMenu(MenuState newMenuState) {
     menuState = newMenuState;
     menuItemCount = 0;
     currentMenuItemIndex = 0;
+    memset(menuItemNameList, 0, sizeof(menuItemNameList));
     switch(menuState) {
         case MAIN_MENU:
             MENU_DrawMainMenu();
@@ -117,4 +115,17 @@ void MENU_SwitchMenu(MenuState newMenuState) {
             break;
     }
     MENU_DrawArrow(0);
+}
+
+
+void MENU_DrawScoreBoard(struct Game* game) {
+    // Show player score
+    char scoreBuffer[32];
+    snprintf(scoreBuffer, sizeof(scoreBuffer), "P1 Score: 0");
+    LCD_DrawString(10, 2, scoreBuffer);
+
+    if (Game_GetPlayerCount(game) == 2) {
+        snprintf(scoreBuffer, sizeof(scoreBuffer), "P2 Score: 0");
+        LCD_DrawString(140, 2, scoreBuffer);
+    }
 }

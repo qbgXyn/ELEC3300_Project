@@ -12,16 +12,17 @@ struct Blob {
 	struct Blob* prev;
 	struct Blob* next;
 	uint8_t player_id; // 0 for neutral, 1 for player 1, 2 for player 2
-	uint8_t x;
-	uint8_t y;
+	int x;
+	int y;
 };
 
 
 // create blob and assign coordinate with it
-struct Blob* Blob(uint8_t player_id, Direction dir, Type type, struct Blob* prev, struct Blob* next, uint8_t x, uint8_t y);
+struct Blob* Blob(uint8_t player_id, Direction dir, Type type, struct Blob* prev, struct Blob* next, int x, int y);
 
 int get_Id(struct Blob* blob);
 
+unsigned short Blob_GetColor(struct Blob* blob);
 
 
 

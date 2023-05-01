@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include "Game/Blob.h"
 #include "Game/Game_Data.h"
+#include "GUI/bg.h"
 
 
 /*
@@ -35,14 +36,13 @@ then the second row, to the bottom
 
 
 struct Map {
-	struct Blob*** map_data; // map[width(x)][height(y)]
-	bool map_differ[MAP_WIDTH*MAP_HEIGHT];
-	uint8_t width; // with x 0 as top left and width - 1 as bottom right
-	uint8_t height; // with y 0 as top left and height - 1 as bottom right
+	struct Blob* map_data[MAP_WIDTH][MAP_HEIGHT]; // map[width(x)][height(y)]
+	bool map_differ[MAP_WIDTH][MAP_HEIGHT];
+	BackGroundType map_bg;
 	int food_spawn_interval; // in ms
 };
 
-struct Map* Map(uint8_t height, uint8_t width);
+struct Map* Map();
 
 
 
@@ -50,20 +50,21 @@ void Spawn_Food_Randomly(struct Map* map);
 
 void Spawn_Stone_Randomly(struct Map* map);
 
-void Set_Food(struct Map* map, uint8_t x, uint8_t y);
-void Set_Stone(struct Map* map, uint8_t x, uint8_t y);
-void Set_Empty(struct Map* map, uint8_t x, uint8_t y);
-void Set_Body(struct Map* map, uint8_t x, uint8_t y, struct Blob* blob);
+void Set_Food(struct Map* map, int x, int y);
+void Set_Stone(struct Map* map, int x, int y);
+void Set_Empty(struct Map* map, int x, int y);
+void Set_Body(struct Map* map, int x, int y, struct Blob* blob);
 
-bool Is_Food(struct Map* map, uint8_t x, uint8_t y);
-bool Is_Stone(struct Map* map, uint8_t x, uint8_t y);
-bool Is_Body(struct Map* map, uint8_t x, uint8_t y);
-bool Is_Empty(struct Map* map, uint8_t x, uint8_t y);
+bool Is_Food(struct Map* map, int x, int y);
+bool Is_Stone(struct Map* map, int x, int y);
+bool Is_Body(struct Map* map, int x, int y);
+bool Is_Empty(struct Map* map, int x, int y);
+void Set_Differ(struct Map* map, int x, int y);
 
-void Consume_Food(struct Map* map, uint8_t x, uint8_t y);
+void Consume_Food(struct Map* map, int x, int y);
 
 void ClearMap(struct Map* map);
-void ClearCell(struct Map* map, uint8_t x, uint8_t y);
+void ClearCell(struct Map* map, int x, int y);
 void Map_Delete(struct Map* map);
 
 void FillMap(struct Map* map, Type type);

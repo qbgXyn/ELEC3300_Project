@@ -9,6 +9,7 @@
         "blob.h": "c",
         "snake.h": "c",
         "string.h": "c",
-        "menu.h": "c"
+        "menu.h": "c",
+        "internal_bg.h": "c"
     }
 }

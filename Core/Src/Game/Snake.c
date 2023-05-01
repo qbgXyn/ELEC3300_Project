@@ -6,27 +6,14 @@
 
 
 // create a new snake with given id and position (x, y) and direction
-struct Snake* Snake(struct Map* map, uint8_t player_id, uint8_t x, uint8_t y, Direction dir, uint8_t length) {
+struct Snake* Snake(struct Map* map, uint8_t player_id, int x, int y, Direction dir, uint8_t length) {
     struct Snake* snake = malloc(sizeof(struct Snake));
     struct Blob* head = Blob(player_id, dir, BODY, NULL, NULL, x, y);
     Set_Body(map, x, y, head);
     snake->head = head;
     snake->tail = head;
     for (int i = 1; i < length; i++) {
-        switch (dir) {
-            case UP:
-                y--;
-                break;
-            case DOWN:
-                y++;
-                break;
-            case LEFT:
-                x++;
-                break;
-            case RIGHT:
-                x--;
-                break;
-        }
+        Snake_GetPreviousBodyPosition(snake->tail, &x, &y);
         struct Blob* blob = Blob(player_id, dir, BODY, snake->tail, NULL, x, y);
         Set_Body(map, x, y, blob);
         snake->tail->next = blob;
@@ -39,6 +26,40 @@ struct Snake* Snake(struct Map* map, uint8_t player_id, uint8_t x, uint8_t y, Di
 }
 
 
+//given a coordinate and direction, and length, return if the snake can spawn at that position
+bool Snake_IsSpawnable(struct Map* map, int x, int y, Direction dir, uint8_t length) {
+    length += SNAKE_HEAD_EMPTY_OVERHEAD;
+    if (x < 0 || x >= MAP_WIDTH || y < 0 || y >= MAP_HEIGHT) return false;
+    switch (dir) {
+        case UP:
+            if (y - length < 0) return false;
+            for (int i = 0; i < length; i++) {
+                if (Is_Empty(map, x, y + i) == false) return false;
+            }
+            break;
+        case DOWN:
+            if (y + length >= MAP_HEIGHT) return false;
+            for (int i = 0; i < length; i++) {
+                if (Is_Empty(map, x, y - i) == false) return false;
+            }
+            break;
+        case LEFT:
+            if (x - length < 0) return false;
+            for (int i = 0; i < length; i++) {
+                if (Is_Empty(map, x - i, y) == false) return false;
+            }
+            break;
+        case RIGHT:
+            if (x + length >= MAP_WIDTH) return false;
+            for (int i = 0; i < length; i++) {
+                if (Is_Empty(map, x + i, y) == false) return false;
+            }
+            break;
+    }
+    return true;
+}
+
+
 
 // move snake head to new position by its direction
 // if the snake is dead, kill it
@@ -47,24 +68,12 @@ struct Snake* Snake(struct Map* map, uint8_t player_id, uint8_t x, uint8_t y, Di
 // if the snake eats food, do not delete the tail(that way, the length grows by 1). if not, delete the tail
 void Snake_Update(struct Map* map, struct Snake* snake) {
     struct Blob* head = snake->head;
-    uint8_t x = head->x;
-    uint8_t y = head->y;
+    int x = head->x;
+    int y = head->y;
     bool eat = false;
-    switch (head->dir) {
-        case UP:
-            y++;
-            break;
-        case DOWN:
-            y--;
-            break;
-        case LEFT:
-            x--;
-            break;
-        case RIGHT:
-            x++;
-            break;
-    }
-    if (x < 0 || x >= map->width || y < 0 || y >= map->height) {
+    Set_Differ(map, x, y); // set the head to different color
+    Snake_GetNextBodyPosition(head, &x, &y);
+    if (x < 0 || x >= MAP_WIDTH || y < 0 || y >= MAP_HEIGHT) {
         Snake_Delete(map, snake);
         return;
     }
@@ -87,6 +96,54 @@ void Snake_Update(struct Map* map, struct Snake* snake) {
     }
 }
 
+// get the previous position of the snake head
+// for example, if the snake is going up, the previous position is (x, y+1)
+void Snake_GetPreviousBodyPosition(struct Blob* blob, int* x, int* y) {
+    if (blob == NULL) return;
+    switch (blob->dir) {
+        case UP:
+            *y = blob->y + 1;
+            *x = blob->x;
+            break;
+        case DOWN:
+            *y = blob->y - 1;
+            *x = blob->x;
+            break;
+        case LEFT:
+            *y = blob->y;
+            *x = blob->x + 1;
+            break;
+        case RIGHT:
+            *y = blob->y;
+            *x = blob->x - 1;
+            break;
+    }
+}
+
+// get the next position of the snake head
+// for example, if the snake is going up, the next position is (x, y-1)
+void Snake_GetNextBodyPosition(struct Blob* blob, int* x, int* y) {
+    if (blob == NULL) return;
+    switch (blob->dir) {
+        case UP:
+            *y = blob->y - 1;
+            *x = blob->x;
+            break;
+        case DOWN:
+            *y = blob->y + 1;
+            *x = blob->x;
+            break;
+        case LEFT:
+            *y = blob->y;
+            *x = blob->x - 1;
+            break;
+        case RIGHT:
+            *y = blob->y;
+            *x = blob->x + 1;
+            break;
+    }
+}
+
 // when a snake hit the wall or itself, call this function, will remove the snake from the game
 void Snake_Delete(struct Map* map, struct Snake* snake) {
     if (snake == NULL) return;
@@ -103,7 +160,7 @@ void Snake_Remove_Tail(struct Map* map, struct Snake* snake) {
     if (snake == NULL) return;
     struct Blob* tail = snake->tail;
     snake->tail = snake->tail->prev;
-    ClearCell(map, tail->next->x, tail->next->y);
+    ClearCell(map, tail->x, tail->y);
     snake->tail->next = NULL;
 }
 
@@ -117,6 +174,14 @@ void Snake_SetDirection(struct Snake* snake, Direction dir) {
 // get the snake's head
 struct Blob* Snake_GetHead(struct Snake* snake) {
     return snake->head;
+}
+
+
+bool Snake_IsDead(struct Snake* snake, struct Blob* blob) {
+    if (blob == NULL) return false;
+    if (snake == NULL) return false;
+    if (blob->player_id != snake->head->player_id) return false;
+    return snake->head == blob;
 }
 
 

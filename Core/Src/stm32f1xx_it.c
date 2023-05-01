@@ -29,6 +29,8 @@
 #include "lcd.h"
 #include "GUI/bg.h"
 #include "GUI/Menu.h"
+#include "Game/Game.h"
+#include <string.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -43,22 +45,22 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
 
 extern uint16_t savedScreen[CONFIRM_BOX_WIDTH * CONFIRM_BOX_HEIGHT];
-extern uint8_t selectedMap;
 extern uint8_t selectedPlayers;
 
 extern uint8_t menuItemCount;
 extern uint8_t currentMenuItemIndex;
+extern char menuItemNameList[8][32];
 
 extern MenuState menuState;
 
-extern int random_map_difficulty;
+
+extern struct Game* game;
 
 /* USER CODE END PV */
 
@@ -70,6 +72,11 @@ extern int random_map_difficulty;
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 extern volatile GUI_TIMER_TIME OS_TimeMS;
+
+
+void handle_map_selection() {
+  strcpy(game->map_name, menuItemNameList[currentMenuItemIndex]);
+}
 
 /* USER CODE END 0 */
 
@@ -280,6 +287,7 @@ void EXTI15_10_IRQHandler(void) {
     if (currentMenuItemIndex == INDEX_SINGLE_PLAYER) {
       menuState = IN_GAME;
       MENU_SwitchMenu(menuState);
+      Game_Start(game);
     }else if (currentMenuItemIndex == INDEX_MULTI_PLAYER) {
       menuState = ROOM_MENU;
       MENU_SwitchMenu(menuState);
@@ -291,9 +299,11 @@ void EXTI15_10_IRQHandler(void) {
     switch (menuState)
     {
     case MAP_MENU:
-      random_map_difficulty = 50 - 10*currentMenuItemIndex;
+      handle_map_selection();
       break;
-    
+    case ROOM_MENU:
+      //handle_room_selection();
+      break;
     default:
       break;
     }
