@@ -4,56 +4,35 @@
 #include <string.h>
 #include "lcd.h"
 #include "GUI/game_gui.h"
+#include "Game/Map.h"
+#include "Game/Game.h"
 
+extern struct Game* game;
 
-
-void GenerateGameMap(uint8_t selectedDifficulty, uint8_t map, uint8_t players)
-{
-    // // Clear LCD
-    // // LCD_Clear(0, 0, 240, 320, 0);
-
-    // // Draw the background according to the type of map chosen by the player
-    // switch (map) {
-    //     case 1: // Forest Map
-    //         LCD_DrawForest();
-    //         break;
-    //     case 2: // City Map
-    //         LCD_DrawDesert();
-    //         break;
-    //     case 3:
-    //         LCD_Clear(0, 0, 240, 320, 0xFFFF);
-    //         break;
-    //     default:
-    //         // Handle any other cases if necessary
-    //         break;
-    // }
-
-    // // Show player score
-    // char scoreBuffer[32];
-    // snprintf(scoreBuffer, sizeof(scoreBuffer), "P1 Score: %d", player1Score);
-    // LCD_DrawString(10, 2, scoreBuffer);
-
-    // if (players == 2) {
-    //     snprintf(scoreBuffer, sizeof(scoreBuffer), "P2 Score: %d", player2Score);
-    //     LCD_DrawString(140, 2, scoreBuffer);
-    // }
-
-    // // Generate maps
-    // srand(HAL_GetTick()); // Initialize the random number seed with the current system clock
-    // for (uint8_t x = 0; x < GRID_SIZE_X; x++) {
-    //     for (uint8_t y = 0; y < GRID_SIZE_Y; y++) {
-    //     	// Initialize the random number seed with the current system clock
-    //         if ((rand() % 100) < (difficulty * 3)) {
-    //             gameMap[x][y] = 1;
-    //             LCD_Fill(x * BLOCK_SIZE, SCORE_AREA_HEIGHT + y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE, BLACK);
-    //         } else {
-    //             gameMap[x][y] = 0;
-    //             // Draw a black square border
-    //             LCD_DrawRectangle(x * BLOCK_SIZE, SCORE_AREA_HEIGHT + y * BLOCK_SIZE, (x * BLOCK_SIZE) + BLOCK_SIZE, (SCORE_AREA_HEIGHT + y * BLOCK_SIZE) + BLOCK_SIZE, BLACK);
-    //         }
-    //     }
-    // }
+void DrawPromptBox() {
+    // Draw the game's prompt box x45, y130, x195, y190 
+    LCD_DrawRectangle(SCREEN_CENTER_X - (CONFIRM_BOX_WIDTH / 2), SCREEN_CENTER_Y - (CONFIRM_BOX_HEIGHT / 2),
+                        SCREEN_CENTER_X + (CONFIRM_BOX_WIDTH / 2), SCREEN_CENTER_Y + (CONFIRM_BOX_HEIGHT / 2), BLACK);
+    LCD_Fill(SCREEN_CENTER_X - (CONFIRM_BOX_WIDTH / 2) + 1, SCREEN_CENTER_Y - (CONFIRM_BOX_HEIGHT / 2) + 1,
+                CONFIRM_BOX_WIDTH - 2, CONFIRM_BOX_HEIGHT - 2, WHITE);
 }
+
+// clear by finding boundary
+// then re-render the background image to the screen
+// and also re-render the menu
+// and also re-render the game
+void ClearPromptBox() {
+    int x = (SCREEN_CENTER_X - (CONFIRM_BOX_WIDTH / 2)) / BLOCK_SIZE;
+    int y = (SCREEN_CENTER_Y - (CONFIRM_BOX_HEIGHT / 2) - SCORE_AREA_HEIGHT) / BLOCK_SIZE;
+    int width = CONFIRM_BOX_WIDTH / BLOCK_SIZE + 1;
+    int height = CONFIRM_BOX_HEIGHT / BLOCK_SIZE + 1;
+    for (int j = y; j < y + height; j++) {
+        for(int i = x; i < x + width; i++) {
+            Set_Differ(game->map, i, j);
+        }
+    }
+}
+
 
 
 
@@ -64,22 +43,52 @@ void GenerateGameMap(uint8_t selectedDifficulty, uint8_t map, uint8_t players)
 // k2 - Main Menu
 int8_t ShowExitConfirmation() {
 		// Draw the game's prompt box
-	    LCD_DrawRectangle(SCREEN_CENTER_X - (CONFIRM_BOX_WIDTH / 2), SCREEN_CENTER_Y - (CONFIRM_BOX_HEIGHT / 2),
-	                      SCREEN_CENTER_X + (CONFIRM_BOX_WIDTH / 2), SCREEN_CENTER_Y + (CONFIRM_BOX_HEIGHT / 2), BLACK);
-	    LCD_Fill(SCREEN_CENTER_X - (CONFIRM_BOX_WIDTH / 2) + 1, SCREEN_CENTER_Y - (CONFIRM_BOX_HEIGHT / 2) + 1,
-	             CONFIRM_BOX_WIDTH - 2, CONFIRM_BOX_HEIGHT - 2, WHITE);
+	    DrawPromptBox();
 
 	    // Display prompt text
-	    LCD_DrawString(SCREEN_CENTER_X - 60, SCREEN_CENTER_Y - 10, "K1: Reload Map");
+	    LCD_DrawString(SCREEN_CENTER_X - 60, SCREEN_CENTER_Y - 10, "K1: Resume");
 	    LCD_DrawString(SCREEN_CENTER_X - 60, SCREEN_CENTER_Y + 10, "K2: Main Menu");
+
+	    // Waiting for user input
+	    uint8_t exitConfirmed = -1;
+	    while (1) {
+	        if (HAL_GPIO_ReadPin(K1_GPIO_Port, K1_Pin) == GPIO_PIN_SET) {
+	            exitConfirmed = BTN_K1;
+	            break;
+	        }
+	        if (HAL_GPIO_ReadPin(K2_GPIO_Port, K2_Pin) == GPIO_PIN_SET) {
+	            exitConfirmed = BTN_K2;
+	            break;
+	        }
+	    }
+
+	    return exitConfirmed;
+}
+
+char* GetEndGameMessage(int end_game_status) {
+    switch (end_game_status) {
+        case TEXT_GAME_WIN:
+            return "You Win!";
+        case TEXT_GAME_LOSE:
+            return "You Lose!";
+        case TEXT_GAME_OVER:
+            return "Game over!";
+        default:
+            return "Unknown";
+    }
+}
+
+int8_t ShowEndGameMessage(int end_game_status) {
+		// Draw the game's prompt box
+	    DrawPromptBox();
+
+	    // Display prompt text
+	    LCD_DrawString(SCREEN_CENTER_X - 60, SCREEN_CENTER_Y - 10, GetEndGameMessage(end_game_status));
+	    LCD_DrawString(SCREEN_CENTER_X - 60, SCREEN_CENTER_Y + 10, "[K2] Main Menu");
 
 	    // Waiting for user input
 	    uint8_t exitConfirmed = 0;
 	    while (1) {
-	        if (HAL_GPIO_ReadPin(K1_GPIO_Port, K1_Pin) == GPIO_PIN_SET) {
-	            exitConfirmed = 1;
-	            break;
-	        }
 	        if (HAL_GPIO_ReadPin(K2_GPIO_Port, K2_Pin) == GPIO_PIN_SET) {
 	            exitConfirmed = 1;
 	            break;

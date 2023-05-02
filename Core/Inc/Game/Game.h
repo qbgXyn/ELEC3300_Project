@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include "Game/Player.h"
 #include "Game/Game_Data.h"
+#include "GUI/bg.h"
 
 
 
@@ -56,10 +57,15 @@ bool LoadInternalMap(struct Game* game, char* map_name);
 void Game_SetMap(struct Game* game);
 bool Game_IsHost(struct Game* game);
 int Game_GetPlayerCount(struct Game* game);
+void Game_Pause(struct Game* game);
+
+void Game_Resume(struct Game* game);
 
 //private
 void LoadDataToMap(struct Game* game, int x, int y, int data);
 bool Game_IsRandomMap(struct Game* game);
+
+BackGroundType Game_GetMapBgType(struct Game* game);
 
 
 #endif

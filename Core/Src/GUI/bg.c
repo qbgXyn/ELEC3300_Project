@@ -1,14 +1,13 @@
 #include "lcd.h"
 #include "GUI/bg.h"
-<<<<<<< HEAD
 //#include "ff.h"
 
 #include "main.h"
 // #include "ff.h" // Import the FatFS library for reading files from the SD card
-=======
->>>>>>> b5a96daaac737dbd2944180bec50bd16ec02c56f
 #include "internal_bg.h"
 #include <stdlib.h>
+
+unsigned short bgImageData[BG_IMAGE_WIDTH * BG_IMAGE_HEIGHT];
 
 void BG_DrawBackground(const unsigned short bg[])
 {
@@ -32,10 +31,33 @@ void BG_DrawBackground(const unsigned short bg[])
     }
 }
 
-uint16_t GUI_GetBackgroundPixel(uint16_t x, uint16_t y) {
+inline uint16_t GUI_GetBackgroundPixel(const unsigned short* bg, uint16_t x, uint16_t y) {
     // Assume that the background image data is stored in an array named bgImageData
     // Please note that if your background image data is stored differently, modify this function accordingly
-    return bgImageData[y * BG_IMAGE_WIDTH + x];
+    return bg[y * BG_IMAGE_WIDTH + x];
+}
+
+// restore background image
+// x : x coordinate of the top left corner of the area to be restored
+// y : y coordinate of the top left corner of the area to be restored
+// width : width of the area to be restored
+// height : height of the area to be restored
+void BG_RestoreBackground(const unsigned short* bg, uint16_t start_x, uint16_t start_y, uint16_t width, uint16_t height) {
+    uint16_t x, y;
+    if (bg == NULL) {
+        LCD_Clear (start_x, start_y, width, height, BACKGROUND);
+        return;
+    }
+    LCD_OpenWindow(start_x, start_y, width, height);
+    LCD_Write_Cmd(CMD_SetPixel);
+
+    for (y = start_y; y < start_y + height; y++)
+    {
+        for (x = start_x; x < start_x + width; x++)
+        {
+            LCD_Write_Data(bg[y * LCD_DispWindow_COLUMN + x]);
+        }
+    }
 }
 
 void GUI_LoadBackgroundFromSDCard(const char *filename) {
@@ -107,8 +129,11 @@ const unsigned short* BG_GetBackGround(BackGroundType bg) {
         case BG_MAIN:
             bg_data = BG_MAIN_MENU_DATA;
             break;
-        default:
+        case BG_CLASSIC:
             bg_data = NULL;
+            break;
+        default:
+            bg_data = BG_MAIN_MENU_DATA;
             break;
     }
     return bg_data;

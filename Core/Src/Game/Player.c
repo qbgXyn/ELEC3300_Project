@@ -45,12 +45,15 @@ void Player_Update(struct Map* map, struct Player* player) {
             Snake_SetDirection(player->snake, i);
         }
     }
-    Snake_Update(map, player->snake);
+    Snake_Update(player, map, player->snake);
+    if (player->snake == NULL) {
+        player->is_alive = false;
+    }
 }
 
 void Player_Delete(struct Map* map, struct Player* player) {
     if (player == NULL) return;
-    Snake_Delete(map, player->snake);
+    Snake_Delete(player, map, player->snake);
     free(player);
 }
 

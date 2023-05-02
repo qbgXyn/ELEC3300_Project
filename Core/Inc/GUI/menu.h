@@ -18,7 +18,8 @@ typedef enum {
     MAIN_MENU,
     MAP_MENU,
     ROOM_MENU,
-	IN_GAME
+	IN_GAME,
+    END_GAME
 } MenuState;
 
 
@@ -29,6 +30,7 @@ void MENU_DrawSubmenu(uint8_t submenuIndex);
 void MENU_DrawMainMenu(void);
 void MENU_SwitchMenu(MenuState newMenuState);
 void MENU_DrawScoreBoard(struct Game* game);
+void MENU_SetState(MenuState state);
 
 
 #endif
