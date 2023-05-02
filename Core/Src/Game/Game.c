@@ -8,6 +8,7 @@
 #include "GUI/bg.h"
 #include "GUI/menu.h"
 #include "lcd.h"
+#include "GUI/game_gui.h"
 
 // init map is NULL first, set map name TEXT_CLASSIC
 struct Game* Game(int player_count, int local_player_id) {
@@ -31,6 +32,11 @@ void Game_Update(struct Game* game) {
             Player_Update(game->map, &game->player_other);
         }
     }
+    if ((game->game_mode == SINGLE_PLAYER && game->player_self.is_alive == false)) {
+        Game_End(game);
+        MENU_SetState(END_GAME);
+        ShowEndGameMessage(TEXT_GAME_OVER);
+    }
 }
 
 void Game_Render(struct Game* game) {
@@ -43,7 +49,7 @@ void Game_Render(struct Game* game) {
                 game->map->map_differ[x][y] = false;
                 // call render function
                 if (Is_Empty(game->map, x, y)) {
-                    // call something to recover background
+                    BG_RestoreBackground(BG_GetBackGround(Game_GetMapBgType(game)), x * BLOCK_SIZE, SCORE_AREA_HEIGHT + y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
                     LCD_DrawRectangle(x * BLOCK_SIZE, SCORE_AREA_HEIGHT + y * BLOCK_SIZE, (x * BLOCK_SIZE) + BLOCK_SIZE, (SCORE_AREA_HEIGHT + y * BLOCK_SIZE) + BLOCK_SIZE, EMPTY_COLOR);
                 } else {
                     LCD_Fill(x * BLOCK_SIZE, SCORE_AREA_HEIGHT + y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE, Blob_GetColor(game->map->map_data[x][y]));
@@ -61,7 +67,7 @@ void Game_Start(struct Game* game) {
     // LCD_Clear(0, 0, 240, 320, 0);
 
     // Draw the background according to the type of map chosen by the player
-    BG_DrawBackground(BG_GetBackGround(game->map->map_bg));
+    BG_DrawBackground(BG_GetBackGround(Game_GetMapBgType(game)));
     MENU_DrawScoreBoard(game);
 
     // generate all players and add them to the map
@@ -74,6 +80,23 @@ void Game_Start(struct Game* game) {
     }
     
     game->is_running = true;
+}
+
+void Game_Pause(struct Game* game) {
+    game->is_running = false;
+}
+
+void Game_Resume(struct Game* game) {
+    game->is_running = true;
+}
+
+void Game_End(struct Game* game) {
+    game->is_running = false;
+    // Clear all things
+    Player_Delete(game->map, &game->player_self);
+    Player_Delete(game->map, &game->player_other);
+    Map_Delete(game->map);
+    game->map = NULL;
 }
 
 //clear all neurtal stuff such as food and stone  by calling clearmap
@@ -155,7 +178,7 @@ bool LoadFileMap(struct Game* game, char* map_name) {
 bool LoadInternalMap(struct Game* game, char* map_name) {
     if (strcmp(map_name, TEXT_CLASSIC) == 0) {
         if (game->map != NULL) {
-        Map_Delete(game->map);
+            Map_Delete(game->map);
         }
         game->map = Map(MAP_WIDTH, MAP_HEIGHT);
         game->map->map_bg = BG_CLASSIC;
@@ -170,7 +193,7 @@ bool LoadInternalMap(struct Game* game, char* map_name) {
     // should combine map_name, map_bg together 
     if(strcmp(map_name, TEXT_FOREST) == 0) {
         if (game->map != NULL) {
-        Map_Delete(game->map);
+            Map_Delete(game->map);
         }
         game->map = Map(MAP_WIDTH, MAP_HEIGHT);
         game->map->map_bg = BG_FOREST;
@@ -183,7 +206,7 @@ bool LoadInternalMap(struct Game* game, char* map_name) {
     }
     if(strcmp(map_name, TEXT_DESERT) == 0) {
         if (game->map != NULL) {
-        Map_Delete(game->map);
+            Map_Delete(game->map);
         }
         game->map = Map(MAP_WIDTH, MAP_HEIGHT);
         game->map->map_bg = BG_DESERT;
@@ -265,4 +288,11 @@ void Game_SetHost(struct Game* game, bool is_host) {
 
 int Game_GetPlayerCount(struct Game* game) {
     return game->player_other.is_alive ? 2 : 1;
+}
+
+BackGroundType Game_GetMapBgType(struct Game* game) {
+    if (game->map == NULL) {
+        return BG_MAIN;
+    }
+    return game->map->map_bg;
 }

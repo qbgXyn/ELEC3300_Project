@@ -123,19 +123,21 @@ int main(void)
     // to simulate the game start
     // since debug cannot track interrupt
     
-    // strcpy(game->map_name, "Random(Easy)");
+    //strcpy(game->map_name, "Forest");
     // menuState = IN_GAME;
     // MENU_SwitchMenu(menuState);
     // Game_Start(game);
+
+    //BG_RestoreBackground(BG_FOREST_DATA, 0, 0, 240, 100);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    Game_Update(game);
     Game_Render(game);
     HAL_Delay(1000/TICK); // simulation only, should be replaced by timer to run code and update game
-    Game_Update(game);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

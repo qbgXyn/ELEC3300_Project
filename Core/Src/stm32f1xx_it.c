@@ -78,6 +78,57 @@ void handle_map_selection() {
   strcpy(game->map_name, menuItemNameList[currentMenuItemIndex]);
 }
 
+void handle_BTN_pressed_InGame() {
+    Game_Pause(game);
+    if (ShowExitConfirmation() == BTN_K2) {
+        Game_End(game);
+        menuState = MAIN_MENU;
+        MENU_DrawMainMenu();
+    }else if (ShowExitConfirmation() == BTN_K1){
+        ClearPromptBox();
+        Game_Resume(game);
+    }
+}
+
+void handle_K2_pressed_EndGame() {
+    menuState = MAIN_MENU;
+    MENU_DrawMainMenu();
+}
+
+void handle_K2_pressed_MainMenu() {
+    switch (currentMenuItemIndex) {
+        case INDEX_SINGLE_PLAYER:
+              menuState = IN_GAME;
+              MENU_SwitchMenu(menuState);
+              Game_Start(game);
+              break;
+        case INDEX_MULTI_PLAYER:
+              menuState = ROOM_MENU;
+              MENU_SwitchMenu(menuState);
+              break;
+        case INDEX_CHOOSE_MAP:
+              menuState = MAP_MENU;
+              MENU_SwitchMenu(menuState);
+              break;
+        default:
+              break;
+    }
+}
+
+void handle_K2_pressed_SubMenu() {
+    switch (menuState) {
+        case MAP_MENU:
+              handle_map_selection();
+              break;
+        case ROOM_MENU:
+              break;
+        default:
+              break;
+    }
+    menuState = MAIN_MENU;
+    MENU_SwitchMenu(menuState);
+}
+
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
@@ -231,107 +282,40 @@ void SysTick_Handler(void)
 
 //handling K1 button
 void EXTI0_IRQHandler(void) {
-	 if (menuState == IN_GAME) {
-	        if (ShowExitConfirmation()) {
-	        	// Reload the map
-	            //GenerateGameMap(selectedMap, selectedPlayers);
-	            menuState = IN_GAME;
-	            HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
-	            return;
-	        }
-	    }
-  if (menuState != IN_GAME) {
+  if (menuState == MAIN_MENU || menuState == MAP_MENU) { 
     MENU_SelectNextItem();
   }
 
-    // if (menuState != IN_GAME) {
-    //     if (menuState == MAIN_MENU) {
-    //         uint8_t menuItemCount = 5; // Update the number of items in the main menu
-    //         uint8_t nextMenuItem = (currentMenuItemIndex + 1) % menuItemCount;
-    //         MENU_DrawMenuItem(nextMenuItem);
-    //     } else {
-    //         uint8_t submenuItemCount;
-    //         if (menuState == DIFFICULTY_MENU) {
-    //             submenuItemCount = 3; // Number of items updated as difficulty submenu
-    //         } else if (menuState == MAP_MENU) {
-    //             submenuItemCount = 3; // Number of items updated as map submenu
-    //         } else if (menuState == PLAYERS_MENU) {
-    //             submenuItemCount = 2; // Number of items updated as player submenu
-    //         } else if (menuState == HIGH_SCORES_MENU) {
-    //             submenuItemCount = 1; // Set to the currently selected number of players
-    //         } else {
-    //             submenuItemCount = 2; // Number of items updated to other submenus
-    //         }
-    //         uint8_t nextSubmenuItem = (currentSubmenuItem + 1) % submenuItemCount;
-    //         LCD_ClearArrow(currentSubmenuItem); // Use the new clear arrow function
-    //         LCD_DrawArrow(nextSubmenuItem); // Use the new draw arrow function
-    //         currentSubmenuItem = nextSubmenuItem;
-    //     }
-    // }
-    HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
+  if (menuState == IN_GAME) {
+    handle_BTN_pressed_InGame();
+  }
+
+  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
 }
 
 
 //handling K2 button
 void EXTI15_10_IRQHandler(void) {
-	 if (menuState == IN_GAME) {
-	        if (ShowExitConfirmation()) {
-	            menuState = MAIN_MENU;
-	            MENU_DrawMainMenu();
-	            HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_13);
-	            return;
-	        }
-	 }
 
-  if (menuState == MAIN_MENU) {
-    if (currentMenuItemIndex == INDEX_SINGLE_PLAYER) {
-      menuState = IN_GAME;
-      MENU_SwitchMenu(menuState);
-      Game_Start(game);
-    }else if (currentMenuItemIndex == INDEX_MULTI_PLAYER) {
-      menuState = ROOM_MENU;
-      MENU_SwitchMenu(menuState);
-    }else if (currentMenuItemIndex == INDEX_CHOOSE_MAP) {
-      menuState = MAP_MENU;
-      MENU_SwitchMenu(menuState);
-    }
-  }else {
-    switch (menuState)
-    {
-    case MAP_MENU:
-      handle_map_selection();
-      break;
-    case ROOM_MENU:
-      //handle_room_selection();
-      break;
+    
+switch (menuState) {
+    case IN_GAME:
+          handle_BTN_pressed_InGame();
+          break;
+    case END_GAME:
+          handle_K2_pressed_EndGame();
+          break;
+    case MAIN_MENU:
+          handle_K2_pressed_MainMenu();
+          break;
     default:
-      break;
+          handle_K2_pressed_SubMenu();
+          break;
     }
-    menuState = MAIN_MENU;
-    MENU_SwitchMenu(menuState);
-  }
 
-  //   if (menuState == MAIN_MENU) {
-  //       if (currentMenuItemIndex == 4) { // If the "Start Game" option is selected
-  //           menuState = IN_GAME;
-  //           //DisplayScore(0, selectedPlayers);
-  //       }else {
-  //           menuState = (MenuState)(currentMenuItemIndex + 1); // Set menuState according to currentMenuItemIndex
-  //           MENU_DrawSubmenu(currentMenuItemIndex + 1);
-  //       }
-  //   } else {
-  //       /// The confirmation of the submenu is handled here
-  //       // Perform the corresponding actions based on menuState and currentSubmenuItem
-  //       switch (menuState) {
-  //           case MAP_MENU:
-  //               selectedMap = currentSubmenuItem + 1;
-  //               break;
-  //       }
-  //       // Back to the main menu
-  //       menuState = MAIN_MENU;
-  //       LCD_DrawMenu();
-  //   }
-    HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_13);
+  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_13);
+
+
 }
 
 

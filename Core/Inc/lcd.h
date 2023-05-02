@@ -49,7 +49,7 @@
 #define      PLAYER_1_BODY_COLOR           BLUE
 #define      PLAYER_2_HEAD_COLOR           GREEN
 #define      PLAYER_2_BODY_COLOR           YELLOW
-#define      STONE_COLOR                   GREY
+#define      STONE_COLOR                   BLACK
 #define      FOOD_COLOR                    RED
 #define      EMPTY_COLOR                   BLACK
 

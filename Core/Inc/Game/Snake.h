@@ -5,10 +5,12 @@
 #include <stdint.h>
 #include "Game/Blob.h"
 
+
 #define SNAKE_START_LENGTH 3
 #define SNAKE_HEAD_EMPTY_OVERHEAD 2 // the number of empty spaces at  the front of head of the snake, to give some space for the head to turn
 
 struct Map;
+struct Player;
 
 struct Snake {
 	struct Blob* head; // the head of the snake
@@ -18,9 +20,9 @@ struct Snake {
 struct Snake* Snake(struct Map* map, uint8_t player_id, int x, int y, Direction dir, uint8_t length);
 
 
-void Snake_Update(struct Map* map, struct Snake* snake);
+void Snake_Update(struct Player* player, struct Map* map, struct Snake* snake);
 void Snake_Grow(struct Map* map, struct Snake* snake);
-void Snake_Delete(struct Map* map, struct Snake* snake);
+void Snake_Delete(struct Player* player, struct Map* map, struct Snake* snake);
 
 void Snake_SetDirection(struct Snake* snake, Direction dir);
 

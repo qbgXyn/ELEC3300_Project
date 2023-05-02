@@ -7,6 +7,7 @@
 #include "internal_bg.h"
 #include "internal_map.h"
 #include "Game/game.h"
+#include "Game/Map.h"
 
 
 uint8_t menuItemCount = 0; // Number of menu items, dynamically updated when you call additem(), set to 0 when change menu
@@ -27,6 +28,7 @@ void MENU_ClearArrow(uint8_t menuItemIndex) {
 	// Clear the arrow symbol ">" in front of the last selected menu item
     uint16_t arrow_y = MENU_ITEM_START_Y + menuItemIndex * MENU_ITEM_DISTANCE;
     LCD_DrawString(20, arrow_y, " ");
+    BG_RestoreBackground(BG_GetBackGround(Game_GetMapBgType(game)), 20, arrow_y, WIDTH_EN_CHAR, HEIGHT_EN_CHAR);
 }
 
 void MENU_DrawArrow(uint8_t menuItemIndex)
@@ -128,4 +130,8 @@ void MENU_DrawScoreBoard(struct Game* game) {
         snprintf(scoreBuffer, sizeof(scoreBuffer), "P2 Score: 0");
         LCD_DrawString(140, 2, scoreBuffer);
     }
+}
+
+void MENU_SetState(MenuState state) {
+    menuState = state;
 }

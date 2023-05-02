@@ -5,7 +5,7 @@
 #include <stdint.h>
 
 typedef enum {UP, DOWN, LEFT, RIGHT} Direction;
-typedef enum {EMPTY, BODY, FOOD, STONE} Type;
+typedef enum {EMPTY, BODY, STONE, FOOD} Type;
 struct Blob {
 	Direction dir;
 	Type type;

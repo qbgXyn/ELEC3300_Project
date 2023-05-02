@@ -3,6 +3,7 @@
 #include "Game/Snake.h"
 #include <stdlib.h>
 #include <stdbool.h>
+#include "Game/Player.h"
 
 
 // create a new snake with given id and position (x, y) and direction
@@ -66,7 +67,7 @@ bool Snake_IsSpawnable(struct Map* map, int x, int y, Direction dir, uint8_t len
 // if the snake is not dead, check if the snake eats food
 // move the snake by create a new head
 // if the snake eats food, do not delete the tail(that way, the length grows by 1). if not, delete the tail
-void Snake_Update(struct Map* map, struct Snake* snake) {
+void Snake_Update(struct Player* player, struct Map* map, struct Snake* snake) {
     struct Blob* head = snake->head;
     int x = head->x;
     int y = head->y;
@@ -74,12 +75,12 @@ void Snake_Update(struct Map* map, struct Snake* snake) {
     Set_Differ(map, x, y); // set the head to different color
     Snake_GetNextBodyPosition(head, &x, &y);
     if (x < 0 || x >= MAP_WIDTH || y < 0 || y >= MAP_HEIGHT) {
-        Snake_Delete(map, snake);
+        Snake_Delete(player, map, snake);
         return;
     }
     if (Is_Empty(map, x, y) == false) {
         if (Is_Stone(map, x, y) || Is_Body(map, x, y)) {
-            Snake_Delete(map, snake);
+            Snake_Delete(player, map, snake);
             return;
         }
         if(Is_Food(map, x, y)) {
@@ -145,7 +146,7 @@ void Snake_GetNextBodyPosition(struct Blob* blob, int* x, int* y) {
 }
 
 // when a snake hit the wall or itself, call this function, will remove the snake from the game
-void Snake_Delete(struct Map* map, struct Snake* snake) {
+void Snake_Delete(struct Player* player, struct Map* map, struct Snake* snake) {
     if (snake == NULL) return;
     struct Blob* blob = snake->head;
     while (blob != NULL) {
@@ -154,6 +155,7 @@ void Snake_Delete(struct Map* map, struct Snake* snake) {
         blob = next;
     }
     free(snake);
+    player->snake = NULL;
 }
 
 void Snake_Remove_Tail(struct Map* map, struct Snake* snake) {
