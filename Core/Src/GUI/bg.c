@@ -1,9 +1,12 @@
 #include "lcd.h"
 #include "GUI/bg.h"
+<<<<<<< HEAD
 //#include "ff.h"
 
 #include "main.h"
 // #include "ff.h" // Import the FatFS library for reading files from the SD card
+=======
+>>>>>>> b5a96daaac737dbd2944180bec50bd16ec02c56f
 #include "internal_bg.h"
 #include <stdlib.h>
 

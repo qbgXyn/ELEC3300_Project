@@ -4,7 +4,6 @@
 #include "Game/Game.h"
 
 
-
 struct Player Player(){
     struct Player player = {
         .score = 0,

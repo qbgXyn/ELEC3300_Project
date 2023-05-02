@@ -5,7 +5,6 @@
 
 
 
-
 struct Map* Map() {
     
     struct Map* m = malloc(sizeof(struct Map));
