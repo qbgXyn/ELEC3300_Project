@@ -11,6 +11,8 @@
 #define INDEX_MULTI_PLAYER 1
 #define INDEX_CHOOSE_MAP 2
 
+#include "Game/Game.h"
+
 
 typedef enum {
     MAIN_MENU,
@@ -26,6 +28,7 @@ void MENU_AddItem(char* title);
 void MENU_DrawSubmenu(uint8_t submenuIndex);
 void MENU_DrawMainMenu(void);
 void MENU_SwitchMenu(MenuState newMenuState);
+void MENU_DrawScoreBoard(struct Game* game);
 
 
 #endif

@@ -68,19 +68,17 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-uint8_t selectedMap = 1;
-uint8_t selectedPlayers = 1;
 
 int highScore = 0; // for player on this device only
 
 uint8_t player1Score = 0;
 uint8_t player2Score = 0;
 
-int random_map_difficulty = 20; // 1/random_map_difficulty chance of a cell to be a stone
-
 extern uint8_t menuItemCount;
 extern MenuState menuState;
 extern uint8_t currentMenuItem;
+
+struct Game* game;
 
 
 
@@ -118,20 +116,26 @@ int main(void)
   MX_CRC_Init();
   /* USER CODE BEGIN 2 */
     LCD_INIT();
-    BG_DrawBackground(main_menu);
+    game = Game(1, 0);
     MENU_SwitchMenu(MAIN_MENU);
-    struct Game* game = Game(1, 0);
     
-    Game_Start(game);
+    // these lines of code is copied from K2
+    // to simulate the game start
+    // since debug cannot track interrupt
+    
+    // strcpy(game->map_name, "Random(Easy)");
+    // menuState = IN_GAME;
+    // MENU_SwitchMenu(menuState);
+    // Game_Start(game);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-//    Game_Update(game);
-//    Game_Render(game);
-//    HAL_Delay(1000/TICK);
+    Game_Render(game);
+    HAL_Delay(1000/TICK); // simulation only, should be replaced by timer to run code and update game
+    Game_Update(game);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
