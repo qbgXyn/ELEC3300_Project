@@ -33,13 +33,15 @@ struct Game {
 };
 
 
-struct Game* Game(int player_count, int local_player_id);
+struct Game* Game();
 
 void Game_Update(struct Game* game);
 
 void Game_Render(struct Game* game);
 
 void Game_Start(struct Game* game);
+
+void Game_End(struct Game* game);
 
 // void Game_Destroy(struct Game* game);
 

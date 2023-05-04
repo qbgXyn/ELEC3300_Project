@@ -11,7 +11,7 @@
 #include "GUI/game_gui.h"
 
 // init map is NULL first, set map name TEXT_CLASSIC
-struct Game* Game(int player_count, int local_player_id) {
+struct Game* Game() {
     struct Game* game = (struct Game*)malloc(sizeof(struct Game));
     game->map = NULL;
     strcpy(game->map_name, TEXT_CLASSIC);
@@ -26,11 +26,9 @@ struct Game* Game(int player_count, int local_player_id) {
 }
 
 void Game_Update(struct Game* game) {
-    if (game->is_running) {
-        Player_Update(game->map, &game->player_self);
-        if (game->game_mode == MULTI_PLAYER) {
-            Player_Update(game->map, &game->player_other);
-        }
+    Player_Update(game->map, &game->player_self);
+    if (game->game_mode == MULTI_PLAYER) {
+        Player_Update(game->map, &game->player_other);
     }
     if ((game->game_mode == SINGLE_PLAYER && game->player_self.is_alive == false)) {
         Game_End(game);
@@ -43,13 +41,14 @@ void Game_Render(struct Game* game) {
     if (game->map == NULL) {
         return;
     }
+    const unsigned short* bg= BG_GetBackGround(Game_GetMapBgType(game));
     for (int x = 0; x < MAP_WIDTH; x++) {
         for (int y = 0; y < MAP_HEIGHT; y++) {
             if (game->map->map_differ[x][y]) {
                 game->map->map_differ[x][y] = false;
                 // call render function
                 if (Is_Empty(game->map, x, y)) {
-                    BG_RestoreBackground(BG_GetBackGround(Game_GetMapBgType(game)), x * BLOCK_SIZE, SCORE_AREA_HEIGHT + y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+                    BG_RestoreBackground(bg, x * BLOCK_SIZE, SCORE_AREA_HEIGHT + y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
                     LCD_DrawRectangle(x * BLOCK_SIZE, SCORE_AREA_HEIGHT + y * BLOCK_SIZE, (x * BLOCK_SIZE) + BLOCK_SIZE, (SCORE_AREA_HEIGHT + y * BLOCK_SIZE) + BLOCK_SIZE, EMPTY_COLOR);
                 } else {
                     LCD_Fill(x * BLOCK_SIZE, SCORE_AREA_HEIGHT + y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE, Blob_GetColor(game->map->map_data[x][y]));
@@ -67,15 +66,24 @@ void Game_Start(struct Game* game) {
     // LCD_Clear(0, 0, 240, 320, 0);
 
     // Draw the background according to the type of map chosen by the player
-    BG_DrawBackground(BG_GetBackGround(Game_GetMapBgType(game)));
+    game->map->map_bg = Game_GetMapBgType(game); // if map is Random, fix the background to certain type
+    BG_DrawBackground(BG_GetBackGround(game->map->map_bg));
     MENU_DrawScoreBoard(game);
 
+    game->player_self.is_alive = true;
+    game->player_self.score = 0;
+    game->player_other.score = 0;
+
     // generate all players and add them to the map
-    Player_SpawnRandom(game, game->map, &game->player_self);
     if (game->game_mode == SINGLE_PLAYER) {
         Game_SetHost(game, true);
         game->player_self.id = PLAYER_1_ID;
+        Player_SpawnRandom(game, game->map, &game->player_self);
     }else {
+        game->player_other.is_alive = true;
+        game->player_self.id = Player_Getid(game);
+        game->player_other.id = Player_Getid(game);
+        Player_SpawnRandom(game, game->map, &game->player_self);
         Player_SpawnRandom(game, game->map, &game->player_other);
     }
     
@@ -293,6 +301,9 @@ int Game_GetPlayerCount(struct Game* game) {
 BackGroundType Game_GetMapBgType(struct Game* game) {
     if (game->map == NULL) {
         return BG_MAIN;
+    }
+    if (game->map->map_bg == BG_RANDOM) {
+        return GetRandomBackgroundType();
     }
     return game->map->map_bg;
 }

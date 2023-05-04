@@ -3,9 +3,9 @@
 
 #define BG_IMAGE_WIDTH 240
 #define BG_IMAGE_HEIGHT 320
-#define BG_COUNTER 3
+#define BG_COUNTER 2
 
-typedef enum {  BG_FOREST, BG_DESERT, BG_CITY, // can be loaded from SD card with type only, no need to load data
+typedef enum {  BG_FOREST, BG_DESERT, // can be loaded from SD card with type only, no need to load data
                 BG_CLASSIC, BG_MAIN, BG_UNKNOWN, BG_RANDOM,  // internal usage only
                 BG_CUSTOM = 1000} BackGroundType; // can be loaded from SD card with type and data
 
@@ -19,5 +19,7 @@ void BG_RestoreBackground(const unsigned short* bg, uint16_t x, uint16_t y, uint
 void GUI_LoadBackgroundFromSDCard(const char *filename);
 const unsigned short* GetRandomBackground();
 const unsigned short* BG_GetBackGround(BackGroundType bg);
+
+BackGroundType GetRandomBackgroundType();
 
 #endif

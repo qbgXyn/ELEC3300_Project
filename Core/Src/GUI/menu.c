@@ -14,7 +14,7 @@ uint8_t menuItemCount = 0; // Number of menu items, dynamically updated when you
 MenuState menuState = MAIN_MENU;
 uint8_t currentMenuItemIndex = 0;
 
-char menuItemNameList[8][32]; // List of menu item names, dynamically updated when you call additem(), set to 0 when change menu
+char menuItemNameList[MAX_TOTAL_ITEM_COUNT][MAX_MAP_NAME_LENGTH]; // List of menu item names, dynamically updated when you call additem(), set to 0 when change menu
 
 
 extern int highScore;
@@ -27,16 +27,17 @@ void MENU_ClearArrow(uint8_t menuItemIndex);
 void MENU_ClearArrow(uint8_t menuItemIndex) {
 	// Clear the arrow symbol ">" in front of the last selected menu item
     uint16_t arrow_y = MENU_ITEM_START_Y + menuItemIndex * MENU_ITEM_DISTANCE;
-    LCD_DrawString(20, arrow_y, " ");
     BG_RestoreBackground(BG_GetBackGround(Game_GetMapBgType(game)), 20, arrow_y, WIDTH_EN_CHAR, HEIGHT_EN_CHAR);
 }
 
 void MENU_DrawArrow(uint8_t menuItemIndex)
 {	// Add the arrow symbol ">" in front of the current selected menu item
     uint16_t arrow_y = MENU_ITEM_START_Y + menuItemIndex * MENU_ITEM_DISTANCE;
-    LCD_DrawString(20, arrow_y, ">");
+    //LCD_DrawString(20, arrow_y, ">");
+    LCD_DrawCharTranslucent(20, arrow_y, '>', WHITE);
 }
 
+// if seleting the last item in the menu, which is "Next Page", then go to the next page
 void MENU_SelectNextItem() {
     // Clear the arrow symbol ">" in front of the last selected menu item
     MENU_ClearArrow(currentMenuItemIndex);
@@ -47,11 +48,29 @@ void MENU_SelectNextItem() {
 }
 
 
+void MENU_SelectPreviousItem() {
+    // Clear the arrow symbol ">" in front of the last selected menu item
+    MENU_ClearArrow(currentMenuItemIndex);
+    // Update the currently selected menu item
+    currentMenuItemIndex = (currentMenuItemIndex - 1 + menuItemCount) % menuItemCount;
+    // Add the arrow symbol ">" in front of the newly selected menu item
+    MENU_DrawArrow(currentMenuItemIndex);
+}
 
+// add a menu item to the menu
+// title: the title of the menu item
+// if it is the last available slot in the menu, it will be set as Next Page
 void MENU_AddItem(char* title) {
-    LCD_DrawString(MENU_ITEM_X, MENU_ITEM_START_Y + menuItemCount * MENU_ITEM_DISTANCE, title);
+    
+    uint16_t y = MENU_ITEM_START_Y + menuItemCount * MENU_ITEM_DISTANCE;
+    if (menuItemCount == MAX_TOTAL_ITEM_COUNT) {
+        y = MENU_ITEM_START_Y + MAX_TOTAL_ITEM_COUNT * MENU_ITEM_DISTANCE;  // draw the last item in the menu
+        return;
+    }
     strcpy(menuItemNameList[menuItemCount], title);
-    ++menuItemCount;
+    //LCD_DrawString(MENU_ITEM_X, y, title);
+    LCD_DrawStringWithColor(MENU_ITEM_X, y, title, TITLE_TEXT_COLOR, TITLE_TEXT_BACKGROUND);
+    menuItemCount++;
 }
 
 void MENU_DrawSubMenu(uint8_t submenuIndex) {

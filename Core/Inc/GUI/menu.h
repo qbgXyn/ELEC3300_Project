@@ -11,6 +11,10 @@
 #define INDEX_MULTI_PLAYER 1
 #define INDEX_CHOOSE_MAP 2
 
+#define MAX_SINGLE_ITEM_COUNT 10
+#define MAX_TOTAL_ITEM_COUNT 100
+#define MAX_MAP_NAME_LENGTH 32
+
 #include "Game/Game.h"
 
 

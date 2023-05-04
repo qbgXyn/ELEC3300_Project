@@ -1,6 +1,8 @@
 #ifndef GAME_GUI_H
 #define GAME_GUI_H
 
+#include <stdint.h>
+
 #define BTN_K1 0
 #define BTN_K2 1
 
@@ -11,5 +13,7 @@
 #include <stdbool.h>
 
 int8_t ShowExitConfirmation();
+
+char* GetEndGameMessage(int end_game_status);
 
 #endif

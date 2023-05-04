@@ -377,7 +377,7 @@ void LCD_DrawChar ( uint16_t usC, uint16_t usP, const char cChar )
 
 }
 
-void LCD_DrawCharWithBGColor ( uint16_t usC, uint16_t usP, const char cChar, uint16_t usColor)
+void LCD_DrawCharWithColor ( uint16_t usC, uint16_t usP, const char cChar, uint16_t usColor, uint16_t bgColor)
 {
 	uint8_t ucTemp, ucRelativePositon, ucPage, ucColumn;
 
@@ -395,10 +395,10 @@ void LCD_DrawCharWithBGColor ( uint16_t usC, uint16_t usP, const char cChar, uin
 		for ( ucColumn = 0; ucColumn < WIDTH_EN_CHAR; ucColumn ++ )
 		{
 			if ( ucTemp & 0x01 )
-				LCD_Write_Data ( 0x001F );
+				LCD_Write_Data ( usColor );
 
 			else
-				LCD_Write_Data (  usColor );
+				LCD_Write_Data (  bgColor );
 
 			ucTemp >>= 1;
 
@@ -422,7 +422,7 @@ void LCD_DrawCharTranslucent ( uint16_t usC, uint16_t usP, const char cChar, uin
 		for ( ucColumn = 0; ucColumn < WIDTH_EN_CHAR; ucColumn ++ )
 		{
 			if ( ucTemp & 0x01 )
-				LCD_DrawDot (ucColumn, ucPage, 0x001F);
+				LCD_DrawDot (ucColumn+ usC, ucPage + usP, usColor);
 			ucTemp >>= 1;
 		}
 
@@ -448,6 +448,33 @@ void LCD_DrawString ( uint16_t usC, uint16_t usP, const char * pStr )
 		}
 		
 		LCD_DrawChar ( usC, usP, * pStr );
+		
+		pStr ++;
+		
+		usC += WIDTH_EN_CHAR;
+		
+	}
+	
+}
+
+void LCD_DrawStringWithColor ( uint16_t usC, uint16_t usP, const char * pStr, uint16_t usColor, uint16_t bgColor)
+{
+	while ( * pStr != '\0' )
+	{
+		if ( ( usC - LCD_DispWindow_Start_COLUMN + WIDTH_EN_CHAR ) > LCD_DispWindow_COLUMN )
+		{
+			usC = LCD_DispWindow_Start_COLUMN;
+			usP += HEIGHT_EN_CHAR;
+		}
+		
+		if ( ( usP - LCD_DispWindow_Start_PAGE + HEIGHT_EN_CHAR ) > LCD_DispWindow_PAGE )
+		{
+			usC = LCD_DispWindow_Start_COLUMN;
+			usP = LCD_DispWindow_Start_PAGE;
+		}
+		
+		//LCD_DrawChar ( usC, usP, * pStr );
+		LCD_DrawCharWithColor(usC, usP, *pStr, usColor, bgColor);
 		
 		pStr ++;
 		
