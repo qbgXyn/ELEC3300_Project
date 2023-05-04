@@ -71,16 +71,12 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
 
 int highScore = 0; // for player on this device only
 
-uint8_t player1Score = 0;
-uint8_t player2Score = 0;
 
 extern uint8_t menuItemCount;
 extern MenuState menuState;
 extern uint8_t currentMenuItem;
 
 struct Game* game;
-
-
 
 
 /* USER CODE END 0 */
@@ -116,17 +112,18 @@ int main(void)
   MX_CRC_Init();
   /* USER CODE BEGIN 2 */
     LCD_INIT();
-    game = Game(1, 0);
+    game = Game();
     MENU_SwitchMenu(MAIN_MENU);
     
     // these lines of code is copied from K2
     // to simulate the game start
     // since debug cannot track interrupt
     
-    //strcpy(game->map_name, "Forest");
+    // strcpy(game->map_name, "Random(Easy)");
     // menuState = IN_GAME;
     // MENU_SwitchMenu(menuState);
     // Game_Start(game);
+    // bool i = false;
 
     //BG_RestoreBackground(BG_FOREST_DATA, 0, 0, 240, 100);
   /* USER CODE END 2 */
@@ -135,9 +132,23 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    Game_Update(game);
-    Game_Render(game);
-    HAL_Delay(1000/TICK); // simulation only, should be replaced by timer to run code and update game
+    if (game->is_running) {
+        Game_Update(game);
+        Game_Render(game);
+        HAL_Delay(1000/TICK); // simulation only, should be replaced by timer to run code and update game
+    }
+    // test code for cannot launch second game
+    // if (i == false) {
+    //     Game_End(game);
+    //     MENU_SetState(END_GAME);
+    //     menuState = MAIN_MENU;
+    //     MENU_SwitchMenu(menuState);
+    //     strcpy(game->map_name, "Random(Easy)");
+    //     menuState = IN_GAME;
+    //     MENU_SwitchMenu(menuState);
+    //     Game_Start(game);
+    //     i = true;
+    // }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

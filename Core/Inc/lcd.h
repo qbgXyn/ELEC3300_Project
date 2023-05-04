@@ -44,6 +44,8 @@
 #define      MAGENTA                       0xF81F
 #define      CYAN                          0x7FFF
 #define      YELLOW                        0xFFE0
+#define      TITLE_TEXT_COLOR              0xB6FD
+#define      TITLE_TEXT_BACKGROUND         0x5ACB
 #define      BACKGROUND		               WHITE
 #define      PLAYER_1_HEAD_COLOR           MAGENTA
 #define      PLAYER_1_BODY_COLOR           BLUE
@@ -70,9 +72,10 @@ void            LCD_Clear		( uint16_t usC, uint16_t usP, uint16_t usWidth, uint1
 uint16_t        LCD_GetPointPixel	( uint16_t usC , uint16_t usP );
 void            LCD_DrawLine		( uint16_t usC1, uint16_t usP1, uint16_t usC2, uint16_t usP2, uint16_t usColor );
 void            LCD_DrawChar		( uint16_t usC, uint16_t usP, const char cChar);
-void            LCD_DrawCharWithBGColor ( uint16_t usC, uint16_t usP, const char cChar, uint16_t usColor);
+void            LCD_DrawCharWithColor ( uint16_t usC, uint16_t usP, const char cChar, uint16_t usColor, uint16_t bgColor);
 void            LCD_DrawCharTranslucent ( uint16_t usC, uint16_t usP, const char cChar, uint16_t usColor);
 void            LCD_DrawString		( uint16_t usC, uint16_t usP, const char * pStr);
+void            LCD_DrawStringWithColor ( uint16_t usC, uint16_t usP, const char * pStr, uint16_t usColor, uint16_t bgColor);
 void            LCD_DrawDot		( uint16_t usC, uint16_t usP, uint16_t usColor );
 void            LCD_DrawRectangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color);
 

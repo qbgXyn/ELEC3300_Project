@@ -50,8 +50,6 @@
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
 
-extern uint16_t savedScreen[CONFIRM_BOX_WIDTH * CONFIRM_BOX_HEIGHT];
-extern uint8_t selectedPlayers;
 
 extern uint8_t menuItemCount;
 extern uint8_t currentMenuItemIndex;
@@ -74,60 +72,7 @@ extern struct Game* game;
 extern volatile GUI_TIMER_TIME OS_TimeMS;
 
 
-void handle_map_selection() {
-  strcpy(game->map_name, menuItemNameList[currentMenuItemIndex]);
-}
 
-void handle_BTN_pressed_InGame() {
-    Game_Pause(game);
-    if (ShowExitConfirmation() == BTN_K2) {
-        Game_End(game);
-        menuState = MAIN_MENU;
-        MENU_DrawMainMenu();
-    }else if (ShowExitConfirmation() == BTN_K1){
-        ClearPromptBox();
-        Game_Resume(game);
-    }
-}
-
-void handle_K2_pressed_EndGame() {
-    menuState = MAIN_MENU;
-    MENU_DrawMainMenu();
-}
-
-void handle_K2_pressed_MainMenu() {
-    switch (currentMenuItemIndex) {
-        case INDEX_SINGLE_PLAYER:
-              menuState = IN_GAME;
-              MENU_SwitchMenu(menuState);
-              Game_Start(game);
-              break;
-        case INDEX_MULTI_PLAYER:
-              menuState = ROOM_MENU;
-              MENU_SwitchMenu(menuState);
-              break;
-        case INDEX_CHOOSE_MAP:
-              menuState = MAP_MENU;
-              MENU_SwitchMenu(menuState);
-              break;
-        default:
-              break;
-    }
-}
-
-void handle_K2_pressed_SubMenu() {
-    switch (menuState) {
-        case MAP_MENU:
-              handle_map_selection();
-              break;
-        case ROOM_MENU:
-              break;
-        default:
-              break;
-    }
-    menuState = MAIN_MENU;
-    MENU_SwitchMenu(menuState);
-}
 
 /* USER CODE END 0 */
 

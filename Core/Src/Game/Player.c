@@ -54,7 +54,7 @@ void Player_Update(struct Map* map, struct Player* player) {
 void Player_Delete(struct Map* map, struct Player* player) {
     if (player == NULL) return;
     Snake_Delete(player, map, player->snake);
-    free(player);
+    //free(player);
 }
 
 int Player_GetScore(struct Player* player) {

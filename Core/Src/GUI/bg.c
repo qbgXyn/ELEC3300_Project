@@ -111,6 +111,23 @@ void GUI_LoadBackgroundFromSDCard(const char *filename) {
 //     return bg;
 // }
 
+BackGroundType GetRandomBackgroundType() {
+    BackGroundType bg;
+    int random = rand() % BG_COUNTER;
+    switch (random) {
+        case BG_FOREST:
+            bg = BG_FOREST;
+            break;
+        case BG_DESERT:
+            bg = BG_DESERT;
+            break;
+        default:
+            bg = BG_MAIN;
+            break;
+    }
+    return bg;
+}
+
 const unsigned short* BG_GetBackGround(BackGroundType bg) {
     const unsigned short* bg_data;
     if (bg == BG_RANDOM) {
@@ -122,9 +139,6 @@ const unsigned short* BG_GetBackGround(BackGroundType bg) {
             break;
         case BG_DESERT:
             bg_data = BG_DESERT_DATA;
-            break;
-        case BG_CITY:
-            bg_data = BG_CITY_DATA;
             break;
         case BG_MAIN:
             bg_data = BG_MAIN_MENU_DATA;

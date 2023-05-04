@@ -34,24 +34,28 @@ bool Snake_IsSpawnable(struct Map* map, int x, int y, Direction dir, uint8_t len
     switch (dir) {
         case UP:
             if (y - length < 0) return false;
+            if (y + length >= MAP_HEIGHT) return false;
             for (int i = 0; i < length; i++) {
                 if (Is_Empty(map, x, y + i) == false) return false;
             }
             break;
         case DOWN:
             if (y + length >= MAP_HEIGHT) return false;
+            if (y - length < 0) return false;
             for (int i = 0; i < length; i++) {
                 if (Is_Empty(map, x, y - i) == false) return false;
             }
             break;
         case LEFT:
             if (x - length < 0) return false;
+            if (x + length >= MAP_WIDTH) return false;
             for (int i = 0; i < length; i++) {
                 if (Is_Empty(map, x - i, y) == false) return false;
             }
             break;
         case RIGHT:
             if (x + length >= MAP_WIDTH) return false;
+            if (x - length < 0) return false;
             for (int i = 0; i < length; i++) {
                 if (Is_Empty(map, x + i, y) == false) return false;
             }
