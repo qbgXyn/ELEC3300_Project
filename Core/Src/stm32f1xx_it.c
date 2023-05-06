@@ -221,7 +221,24 @@ void SysTick_Handler(void)
 /**
   * @brief This function handles EXTI line0 interrupt.
   */
+void EXTI0_IRQHandler(void)
+{
+  /* USER CODE BEGIN EXTI0_IRQn 0 */
 
+  /* USER CODE END EXTI0_IRQn 0 */
+	if (menuState == MAIN_MENU || menuState == MAP_MENU) {
+	    MENU_SelectNextItem();
+	  }
+
+	  if (menuState == IN_GAME) {
+	    handle_BTN_pressed_InGame();
+	  }
+
+	  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
+  /* USER CODE BEGIN EXTI0_IRQn 1 */
+
+  /* USER CODE END EXTI0_IRQn 1 */
+}
 
 /**
   * @brief This function handles TIM2 global interrupt.
@@ -240,42 +257,30 @@ void TIM2_IRQHandler(void)
 /**
   * @brief This function handles EXTI line[15:10] interrupts.
   */
-//handling K1 button
-void EXTI0_IRQHandler(void) {
-  if (menuState == MAIN_MENU || menuState == MAP_MENU) {
-    MENU_SelectNextItem();
-  }
+void EXTI15_10_IRQHandler(void)
+{
+  /* USER CODE BEGIN EXTI15_10_IRQn 0 */
 
-  if (menuState == IN_GAME) {
-    handle_BTN_pressed_InGame();
-  }
+  /* USER CODE END EXTI15_10_IRQn 0 */
+	switch (menuState) {
+	    case IN_GAME:
+	          handle_BTN_pressed_InGame();
+	          break;
+	    case END_GAME:
+	          handle_K2_pressed_EndGame();
+	          break;
+	    case MAIN_MENU:
+	          handle_K2_pressed_MainMenu();
+	          break;
+	    default:
+	          handle_K2_pressed_SubMenu();
+	          break;
+	    }
 
-  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
-}
+	  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_13);
+  /* USER CODE BEGIN EXTI15_10_IRQn 1 */
 
-
-//handling K2 button
-void EXTI15_10_IRQHandler(void) {
-
-
-switch (menuState) {
-    case IN_GAME:
-          handle_BTN_pressed_InGame();
-          break;
-    case END_GAME:
-          handle_K2_pressed_EndGame();
-          break;
-    case MAIN_MENU:
-          handle_K2_pressed_MainMenu();
-          break;
-    default:
-          handle_K2_pressed_SubMenu();
-          break;
-    }
-
-  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_13);
-
-
+  /* USER CODE END EXTI15_10_IRQn 1 */
 }
 
 /* USER CODE BEGIN 1 */

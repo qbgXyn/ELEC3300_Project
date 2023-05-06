@@ -10,6 +10,44 @@
 #include "lcd.h"
 #include "GUI/game_gui.h"
 
+extern TIM_HandleTypeDef htim2;	// the timer TIM2, initialized by HAL_TIM_Base_Start_IT(&htim2) in Game_Start()
+uint32_t game_time = 0;	// game_time, for testing
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {	// Function for updating variables whenever timer ticks
+    if (htim->Instance == TIM2) {	// basically, whenever the timer ticks
+        // Update game state here
+    	game_time++;				// some values get updated.
+    	//toggle_LED();				// function for testing timer, just ignore it
+    }
+
+
+}
+
+void Game_StartTimer();
+void Game_PauseTimer();
+void Game_ResumeTimer(); // Can be moved to Game.h, I guess
+void Game_ResetTimer();
+
+void Game_StartTimer() {
+	HAL_TIM_Base_Stop_IT(&htim2);	// stops timer
+	__HAL_TIM_SET_COUNTER(&htim2, 0);	// set timer to 0
+	HAL_TIM_Base_Start_IT(&htim2);	// starting timer, you can see the same function commented in main.c line under LCD_INIT()
+}
+
+void Game_PauseTimer() {			// Function to stop the time
+    HAL_TIM_Base_Stop_IT(&htim2);
+}
+
+void Game_ResumeTimer() {
+    HAL_TIM_Base_Start_IT(&htim2);
+}
+
+void Game_ResetTimer() {
+	HAL_TIM_Base_Stop_IT(&htim2);
+	__HAL_TIM_SET_COUNTER(&htim2, 0);
+}
+
+
 // init map is NULL first, set map name TEXT_CLASSIC
 struct Game* Game() {
     struct Game* game = (struct Game*)malloc(sizeof(struct Game));
@@ -61,6 +99,7 @@ void Game_Render(struct Game* game) {
 
 void Game_Start(struct Game* game) {
     Game_SetMap(game);
+    Game_StartTimer();
     
     // Clear LCD
     // LCD_Clear(0, 0, 240, 320, 0);
@@ -92,14 +131,17 @@ void Game_Start(struct Game* game) {
 
 void Game_Pause(struct Game* game) {
     game->is_running = false;
+    Game_PauseTimer();
 }
 
 void Game_Resume(struct Game* game) {
     game->is_running = true;
+    Game_ResumeTimer();
 }
 
 void Game_End(struct Game* game) {
     game->is_running = false;
+    Game_ResetTimer();
     // Clear all things
     Player_Delete(game->map, &game->player_self);
     Player_Delete(game->map, &game->player_other);

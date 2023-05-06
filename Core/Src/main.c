@@ -56,7 +56,7 @@ TIM_HandleTypeDef htim2;
 SRAM_HandleTypeDef hsram1;
 
 /* USER CODE BEGIN PV */
-uint32_t game_time = 0;
+//uint32_t game_time = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -82,15 +82,18 @@ extern MenuState menuState;
 extern uint8_t currentMenuItem;
 
 struct Game* game;
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {	// ***
-    if (htim->Instance == TIM2) {
+
+/**
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {	// Function for updating variables whenever timer ticks
+    if (htim->Instance == TIM2) {	// basically, whenever the timer ticks
         // Update game state here
-    	game_time++;
-    	//toggle_LED();
+    	game_time++;				// some values get updated.
+    	//toggle_LED();				// function for testing timer, just ignore it
     }
 
 
 }
+*/
 
 /* USER CODE END 0 */
 
@@ -126,7 +129,7 @@ int main(void)
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
     LCD_INIT();
-    HAL_TIM_Base_Start_IT(&htim2);
+    //HAL_TIM_Base_Start_IT(&htim2);
     game = Game();
     MENU_SwitchMenu(MAIN_MENU);
     
@@ -256,7 +259,7 @@ static void MX_TIM2_Init(void)
 
   /* USER CODE END TIM2_Init 1 */
   htim2.Instance = TIM2;
-  htim2.Init.Prescaler = 71;
+  htim2.Init.Prescaler = 7200;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim2.Init.Period = 9999;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
