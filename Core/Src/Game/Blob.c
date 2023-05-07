@@ -40,7 +40,7 @@ unsigned short Blob_GetColor(struct Blob* blob) {
 				return PLAYER_2_HEAD_COLOR;
 			}
 		}else {
-			if (blob->player_id == PLAYER_2_ID) {
+			if (blob->player_id == PLAYER_1_ID) {
 				return PLAYER_1_BODY_COLOR;
 			}
 			else {

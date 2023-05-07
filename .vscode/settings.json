@@ -10,6 +10,7 @@
         "snake.h": "c",
         "string.h": "c",
         "menu.h": "c",
-        "internal_bg.h": "c"
+        "internal_bg.h": "c",
+        "stdbool.h": "c"
     }
 }

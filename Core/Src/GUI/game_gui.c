@@ -41,7 +41,7 @@ void ClearPromptBox() {
 // and then
 // K1 - Reload Map
 // k2 - Main Menu
-int8_t ShowExitConfirmation() {
+void ShowExitConfirmation() {
 		// Draw the game's prompt box
 	    DrawPromptBox();
 
@@ -49,20 +49,12 @@ int8_t ShowExitConfirmation() {
 	    LCD_DrawString(SCREEN_CENTER_X - 60, SCREEN_CENTER_Y - 10, "K1: Resume");
 	    LCD_DrawString(SCREEN_CENTER_X - 60, SCREEN_CENTER_Y + 10, "K2: Main Menu");
 
-	    // Waiting for user input
-	    uint8_t exitConfirmed = -1;
+		// wait for user to release the button
 	    while (1) {
-	        if (HAL_GPIO_ReadPin(K1_GPIO_Port, K1_Pin) == GPIO_PIN_SET) {
-	            exitConfirmed = BTN_K1;
-	            break;
-	        }
-	        if (HAL_GPIO_ReadPin(K2_GPIO_Port, K2_Pin) == GPIO_PIN_SET) {
-	            exitConfirmed = BTN_K2;
+	        if (HAL_GPIO_ReadPin(K1_GPIO_Port, K1_Pin) == GPIO_PIN_RESET && HAL_GPIO_ReadPin(K2_GPIO_Port, K2_Pin) == GPIO_PIN_RESET) {
 	            break;
 	        }
 	    }
-
-	    return exitConfirmed;
 }
 
 char* GetEndGameMessage(int end_game_status) {

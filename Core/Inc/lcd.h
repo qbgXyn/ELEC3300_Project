@@ -76,6 +76,7 @@ void            LCD_DrawCharWithColor ( uint16_t usC, uint16_t usP, const char c
 void            LCD_DrawCharTranslucent ( uint16_t usC, uint16_t usP, const char cChar, uint16_t usColor);
 void            LCD_DrawString		( uint16_t usC, uint16_t usP, const char * pStr);
 void            LCD_DrawStringWithColor ( uint16_t usC, uint16_t usP, const char * pStr, uint16_t usColor, uint16_t bgColor);
+void            LCD_DrawImgTranslucent ( uint16_t usC, uint16_t usP, const unsigned short* img);
 void            LCD_DrawDot		( uint16_t usC, uint16_t usP, uint16_t usColor );
 void            LCD_DrawRectangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color);
 

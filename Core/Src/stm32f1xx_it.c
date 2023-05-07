@@ -28,6 +28,7 @@
 #include "GUI/bg.h"
 #include "GUI/Menu.h"
 #include "Game/Game.h"
+#include "GUI/event_handler.h"
 #include <string.h>
 /* USER CODE END Includes */
 

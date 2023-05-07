@@ -20,6 +20,7 @@ void GUI_LoadBackgroundFromSDCard(const char *filename);
 const unsigned short* GetRandomBackground();
 const unsigned short* BG_GetBackGround(BackGroundType bg);
 
+
 BackGroundType GetRandomBackgroundType();
 
 #endif
