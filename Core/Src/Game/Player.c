@@ -29,7 +29,8 @@ struct Player Player(){
     // return player;
 }
 
-void Signal_Input(struct Player* player, Direction dir) {
+
+void Player_SetDirection(struct Player* player, Direction dir) {
     player->buttonPressed[dir] = true;
 }
 

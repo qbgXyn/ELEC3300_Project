@@ -138,10 +138,11 @@ int main(void)
     // since debug cannot track interrupt
     
     // strcpy(game->map_name, "Random(Easy)");
-    // menuState = IN_GAME;
-    // MENU_SwitchMenu(menuState);
-    // Game_Start(game);
-    // bool i = false;
+    // handle_K2_pressed_MainMenu();
+    // int i = 0;
+
+    // #include "ascii.h"
+    // LCD_DrawImgTranslucent(0, 0, APPLE, RED);
 
     //BG_RestoreBackground(BG_FOREST_DATA, 0, 0, 240, 100);
   /* USER CODE END 2 */
@@ -156,17 +157,14 @@ int main(void)
         HAL_Delay(1000/TICK); // simulation only, should be replaced by timer to run code and update game
     }
     // test code for cannot launch second game
-    // if (i == false) {
+    // if (i == 5) {
     //     Game_End(game);
     //     MENU_SetState(END_GAME);
-    //     menuState = MAIN_MENU;
-    //     MENU_SwitchMenu(menuState);
-    //     strcpy(game->map_name, "Random(Easy)");
-    //     menuState = IN_GAME;
-    //     MENU_SwitchMenu(menuState);
-    //     Game_Start(game);
-    //     i = true;
+    //     handle_K2_pressed_EndGame();
+    //     handle_K2_pressed_MainMenu();
+
     // }
+    // ++i;
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
