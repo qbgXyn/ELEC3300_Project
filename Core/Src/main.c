@@ -76,6 +76,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim);
 
 int highScore = 0; // for player on this device only
 
+extern uint8_t update_game_flag;  // see declaration in game.c, used in main.c while loop
 
 extern uint8_t menuItemCount;
 extern MenuState menuState;
@@ -151,10 +152,14 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    if (game->is_running) {
-        Game_Update(game);
-        Game_Render(game);
-        HAL_Delay(1000/TICK); // simulation only, should be replaced by timer to run code and update game
+    if (game->is_running) {   // 
+        if (update_game_flag) { // update_game_flag = 1, updates every half a second, same effect as Hal_Delay(1000/TICK), where TICK = 2
+    		  Game_Update(game);
+    		  //Game_Render(game);
+    		  update_game_flag = 0;
+    		  Game_Render(game);
+    		  //HAL_Delay(1000/TICK); // simulation only, should be replaced by timer to run code and update game
+    	}
     }
     // test code for cannot launch second game
     // if (i == 5) {
@@ -259,7 +264,7 @@ static void MX_TIM2_Init(void)
   htim2.Instance = TIM2;
   htim2.Init.Prescaler = 7200;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim2.Init.Period = 9999;
+  htim2.Init.Period = 4999;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim2) != HAL_OK)

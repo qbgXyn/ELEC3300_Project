@@ -14,15 +14,18 @@
 
 extern TIM_HandleTypeDef htim2;	// the timer TIM2, initialized by HAL_TIM_Base_Start_IT(&htim2) in Game_Start()
 uint32_t game_time = 0;	// game_time, for testing
+uint8_t update_game_flag = 0;   // used in main.c
+extern struct Game* game;
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {	// Function for updating variables whenever timer ticks
     if (htim->Instance == TIM2) {	// basically, whenever the timer ticks
-        // Update game state here
-    	game_time++;				// some values get updated.
-    	//toggle_LED();				// function for testing timer, just ignore it
+        // Update game state here  
+    	if (game->is_running){          // some values get updated.
+    		game_time += 0.5;			// now that timer ticks every 0.5 second, the game_time updates by 0.5 per tick understandably
+    		update_game_flag = 1;       // this changes every 0.5 second
+    		//toggle_LED();				// function for testing timer, just ignore it
+    	}
     }
-
-
 }
 
 void Game_StartTimer();
@@ -31,8 +34,8 @@ void Game_ResumeTimer(); // Can be moved to Game.h, I guess
 void Game_ResetTimer();
 
 void Game_StartTimer() {
-	HAL_TIM_Base_Stop_IT(&htim2);	// stops timer
-	__HAL_TIM_SET_COUNTER(&htim2, 0);	// set timer to 0
+	//HAL_TIM_Base_Stop_IT(&htim2);	// stops timer
+	//__HAL_TIM_SET_COUNTER(&htim2, 0);	// set timer to 0
 	HAL_TIM_Base_Start_IT(&htim2);	// starting timer, you can see the same function commented in main.c line under LCD_INIT()
 }
 
