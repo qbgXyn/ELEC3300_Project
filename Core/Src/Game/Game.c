@@ -4,11 +4,13 @@
 #include "Game/Game_Data.h"
 #include "Game/Player.h"
 #include "internal_map.h"
+#include "internal_bg.h"
 #include <string.h>
 #include "GUI/bg.h"
 #include "GUI/menu.h"
 #include "lcd.h"
 #include "GUI/game_gui.h"
+
 
 extern TIM_HandleTypeDef htim2;	// the timer TIM2, initialized by HAL_TIM_Base_Start_IT(&htim2) in Game_Start()
 uint32_t game_time = 0;	// game_time, for testing
@@ -88,7 +90,14 @@ void Game_Render(struct Game* game) {
                 if (Is_Empty(game->map, x, y)) {
                     BG_RestoreBackground(bg, x * BLOCK_SIZE, SCORE_AREA_HEIGHT + y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
                     LCD_DrawRectangle(x * BLOCK_SIZE, SCORE_AREA_HEIGHT + y * BLOCK_SIZE, (x * BLOCK_SIZE) + BLOCK_SIZE, (SCORE_AREA_HEIGHT + y * BLOCK_SIZE) + BLOCK_SIZE, EMPTY_COLOR);
-                } else {
+                } else if (Is_Food(game->map, x, y)) {
+                    BG_RestoreBackground(bg, x * BLOCK_SIZE, SCORE_AREA_HEIGHT + y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+                    LCD_DrawImgTranslucent(x * BLOCK_SIZE, SCORE_AREA_HEIGHT + y * BLOCK_SIZE, APPLE_DATA);
+                } else if (Is_Stone(game->map, x, y)) {
+                    // restore background since stone is immovable
+                    LCD_DrawImgTranslucent(x * BLOCK_SIZE, SCORE_AREA_HEIGHT + y * BLOCK_SIZE, STONE_DATA);
+                }
+                else {
                     LCD_Fill(x * BLOCK_SIZE, SCORE_AREA_HEIGHT + y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE, Blob_GetColor(game->map->map_data[x][y]));
                 }
             }

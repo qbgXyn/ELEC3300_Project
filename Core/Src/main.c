@@ -141,8 +141,8 @@ int main(void)
     // handle_K2_pressed_MainMenu();
     // int i = 0;
 
-    // #include "ascii.h"
-    // LCD_DrawImgTranslucent(0, 0, APPLE, RED);
+    //BG_DrawImg(APPLE_DATA, 0, 0, BLOCK_SIZE, BLOCK_SIZE);
+    //LCD_DrawImgTranslucent(0, 0, STONE_DATA);
 
     //BG_RestoreBackground(BG_FOREST_DATA, 0, 0, 240, 100);
   /* USER CODE END 2 */

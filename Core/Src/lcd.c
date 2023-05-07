@@ -410,26 +410,20 @@ void LCD_DrawCharWithColor ( uint16_t usC, uint16_t usP, const char cChar, uint1
 
 // read through a array with 50 element as little endian (example: FOOD array)
 // and draw it on the screen if it is 1
-void LCD_DrawImgTranslucent ( uint16_t usC, uint16_t usP, const unsigned char* img, uint16_t usColor)
+
+
+void LCD_DrawImgTranslucent ( uint16_t usC, uint16_t usP, const unsigned short* img)
 {
-	uint8_t pixel, ucPage, ucColumn;
-	unsigned short i;
-
-	const unsigned char* imgTemp = img;
-
-	for ( ucPage = 0; ucPage < BLOCK_SIZE; ucPage ++ )
-	{
-		
-		for ( ucColumn = 0; ucColumn < BLOCK_SIZE; ucColumn ++ )
-		{
-			i = imgTemp[(ucColumn + ucPage * BLOCK_SIZE) / 8];
-			if ( i & 0x01<<((ucColumn + ucPage * BLOCK_SIZE) % 8) )
-				LCD_DrawDot ((ucColumn+ usC), ucPage + usP, usColor);
+	for(int y = 0; y < BLOCK_SIZE; ++y) {
+		for(int x = 0; x < BLOCK_SIZE; ++x) {
+			if (img[y*BLOCK_SIZE + x]) {
+				LCD_DrawDot(usC + x, usP + y, img[y*BLOCK_SIZE + x]);
+			}
 		}
-
 	}
-
 }
+
+
 
 
 void LCD_DrawCharTranslucent ( uint16_t usC, uint16_t usP, const char cChar, uint16_t usColor)

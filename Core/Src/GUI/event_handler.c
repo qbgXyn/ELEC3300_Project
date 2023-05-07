@@ -22,7 +22,19 @@ void handle_map_selection() {
 
 void handle_BTN_pressed_InGame() {
     Game_Pause(game);
-    int8_t btn = ShowExitConfirmation();
+    ShowExitConfirmation();
+    int8_t btn;
+    while (1) {
+        if (HAL_GPIO_ReadPin(K1_GPIO_Port, K1_Pin) == GPIO_PIN_SET) {
+            btn = BTN_K1;
+            break;
+        }
+        if (HAL_GPIO_ReadPin(K2_GPIO_Port, K2_Pin) == GPIO_PIN_SET) {
+            btn = BTN_K2;
+            break;
+        }
+    }
+    
     if (btn == BTN_K2) {
         Game_End(game);
         MENU_SetState(MAIN_MENU);

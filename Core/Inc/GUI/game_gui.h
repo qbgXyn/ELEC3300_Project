@@ -12,7 +12,7 @@
 
 #include <stdbool.h>
 
-int8_t ShowExitConfirmation();
+void ShowExitConfirmation();
 
 char* GetEndGameMessage(int end_game_status);
 
