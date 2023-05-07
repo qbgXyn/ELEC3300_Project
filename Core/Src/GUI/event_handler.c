@@ -22,11 +22,12 @@ void handle_map_selection() {
 
 void handle_BTN_pressed_InGame() {
     Game_Pause(game);
-    if (ShowExitConfirmation() == BTN_K2) {
+    int8_t btn = ShowExitConfirmation();
+    if (btn == BTN_K2) {
         Game_End(game);
-        menuState = MAIN_MENU;
-        MENU_DrawMainMenu();
-    }else if (ShowExitConfirmation() == BTN_K1){
+        MENU_SetState(MAIN_MENU);
+        MENU_SwitchMenu(menuState);
+    }else if (btn == BTN_K1){
         ClearPromptBox();
         Game_Resume(game);
     }
