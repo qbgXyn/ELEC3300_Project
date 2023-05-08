@@ -77,6 +77,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim);
 int highScore = 0; // for player on this device only
 
 extern uint8_t update_game_flag;  // see declaration in game.c, used in main.c while loop
+extern uint8_t food_counter;
 
 extern uint8_t menuItemCount;
 extern MenuState menuState;
@@ -153,16 +154,16 @@ int main(void)
   while (1)
   {
     if (game->is_running) {   // 
-        if (update_game_flag) { // update_game_flag > 0, updates every half a second, same effect as Hal_Delay(1000/TICK), where TICK = 2
+        if (update_game_flag) { // update_game_flag == 1, updates every half a second, same effect as Hal_Delay(1000/TICK), where TICK = 2
     		  Game_Update(game);
-    		  //Game_Render(game);
-    		  update_game_flag = 0;
     		  Game_Render(game);
     		  //HAL_Delay(1000/TICK); // simulation only, should be replaced by timer to run code and update game
-    	}
-      if (update_game_flag*(1000/TICK) >= game->food_spawn_interval) { // change to the unit into ms
-          Spawn_Food_Randomly(game->map);
+          ++food_counter;
           update_game_flag = 0;
+    	}
+      if (food_counter*(1000/TICK) >= game->food_spawn_interval) { // change to the unit into ms
+          Spawn_Food_Randomly(game->map);
+          food_counter = 0;
       }
     }
     // test code for cannot launch second game

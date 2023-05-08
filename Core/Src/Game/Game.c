@@ -15,6 +15,7 @@
 extern TIM_HandleTypeDef htim2;	// the timer TIM2, initialized by HAL_TIM_Base_Start_IT(&htim2) in Game_Start()
 uint32_t game_time = 0;	// game_time, for testing
 uint8_t update_game_flag = 0;   // used in main.c
+uint8_t food_counter = 0;
 extern struct Game* game;
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {	// Function for updating variables whenever timer ticks
@@ -95,9 +96,12 @@ void Game_Render(struct Game* game) {
                     LCD_DrawRectangle(x * BLOCK_SIZE, SCORE_AREA_HEIGHT + y * BLOCK_SIZE, (x * BLOCK_SIZE) + BLOCK_SIZE, (SCORE_AREA_HEIGHT + y * BLOCK_SIZE) + BLOCK_SIZE, EMPTY_COLOR);
                 } else if (Is_Food(game->map, x, y)) {
                     BG_RestoreBackground(bg, x * BLOCK_SIZE, SCORE_AREA_HEIGHT + y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+                    LCD_DrawRectangle(x * BLOCK_SIZE, SCORE_AREA_HEIGHT + y * BLOCK_SIZE, (x * BLOCK_SIZE) + BLOCK_SIZE, (SCORE_AREA_HEIGHT + y * BLOCK_SIZE) + BLOCK_SIZE, EMPTY_COLOR);
                     LCD_DrawImgTranslucent(x * BLOCK_SIZE, SCORE_AREA_HEIGHT + y * BLOCK_SIZE, APPLE_DATA);
                 } else if (Is_Stone(game->map, x, y)) {
                     // restore background since stone is immovable
+                    BG_RestoreBackground(bg, x * BLOCK_SIZE, SCORE_AREA_HEIGHT + y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+                    LCD_DrawRectangle(x * BLOCK_SIZE, SCORE_AREA_HEIGHT + y * BLOCK_SIZE, (x * BLOCK_SIZE) + BLOCK_SIZE, (SCORE_AREA_HEIGHT + y * BLOCK_SIZE) + BLOCK_SIZE, EMPTY_COLOR);
                     LCD_DrawImgTranslucent(x * BLOCK_SIZE, SCORE_AREA_HEIGHT + y * BLOCK_SIZE, STONE_DATA);
                 }
                 else {
