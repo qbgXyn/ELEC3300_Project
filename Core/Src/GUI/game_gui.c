@@ -48,13 +48,6 @@ void ShowExitConfirmation() {
 	    // Display prompt text
 	    LCD_DrawString(SCREEN_CENTER_X - 60, SCREEN_CENTER_Y - 10, "K1: Resume");
 	    LCD_DrawString(SCREEN_CENTER_X - 60, SCREEN_CENTER_Y + 10, "K2: Main Menu");
-
-		// wait for user to release the button
-	    while (1) {
-	        if (HAL_GPIO_ReadPin(K1_GPIO_Port, K1_Pin) == GPIO_PIN_RESET && HAL_GPIO_ReadPin(K2_GPIO_Port, K2_Pin) == GPIO_PIN_RESET) {
-	            break;
-	        }
-	    }
 }
 
 char* GetEndGameMessage(int end_game_status) {
@@ -70,22 +63,11 @@ char* GetEndGameMessage(int end_game_status) {
     }
 }
 
-int8_t ShowEndGameMessage(int end_game_status) {
+void ShowEndGameMessage(int end_game_status) {
 		// Draw the game's prompt box
 	    DrawPromptBox();
 
 	    // Display prompt text
 	    LCD_DrawString(SCREEN_CENTER_X - 60, SCREEN_CENTER_Y - 10, GetEndGameMessage(end_game_status));
 	    LCD_DrawString(SCREEN_CENTER_X - 60, SCREEN_CENTER_Y + 10, "[K2] Main Menu");
-
-	    // Waiting for user input
-	    uint8_t exitConfirmed = 0;
-	    while (1) {
-	        if (HAL_GPIO_ReadPin(K2_GPIO_Port, K2_Pin) == GPIO_PIN_SET) {
-	            exitConfirmed = 1;
-	            break;
-	        }
-	    }
-
-	    return exitConfirmed;
 }
