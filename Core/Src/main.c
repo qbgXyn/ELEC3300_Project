@@ -153,13 +153,17 @@ int main(void)
   while (1)
   {
     if (game->is_running) {   // 
-        if (update_game_flag) { // update_game_flag = 1, updates every half a second, same effect as Hal_Delay(1000/TICK), where TICK = 2
+        if (update_game_flag) { // update_game_flag > 0, updates every half a second, same effect as Hal_Delay(1000/TICK), where TICK = 2
     		  Game_Update(game);
     		  //Game_Render(game);
     		  update_game_flag = 0;
     		  Game_Render(game);
     		  //HAL_Delay(1000/TICK); // simulation only, should be replaced by timer to run code and update game
     	}
+      if (update_game_flag*(1000/TICK) >= game->food_spawn_interval) { // change to the unit into ms
+          Spawn_Food_Randomly(game->map);
+          update_game_flag = 0;
+      }
     }
     // test code for cannot launch second game
     // if (i == 5) {

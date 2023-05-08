@@ -22,7 +22,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {	// Function for up
         // Update game state here  
     	if (game->is_running){          // some values get updated.
     		game_time += 0.5;			// now that timer ticks every 0.5 second, the game_time updates by 0.5 per tick understandably
-    		update_game_flag = 1;       // this changes every 0.5 second
+    		++update_game_flag;       // this changes every 0.5 second
     		//toggle_LED();				// function for testing timer, just ignore it
     	}
     }

@@ -33,6 +33,7 @@ bool Snake_IsSpawnable(struct Map* map, int x, int y, Direction dir, uint8_t len
     if (x < 0 || x >= MAP_WIDTH || y < 0 || y >= MAP_HEIGHT) return false;
     switch (dir) {
         case UP:
+            y -= SNAKE_HEAD_EMPTY_OVERHEAD; //shift the head up to make space for the head
             if (y - length < 0) return false;
             if (y + length >= MAP_HEIGHT) return false;
             for (int i = 0; i < length; i++) {
@@ -40,6 +41,7 @@ bool Snake_IsSpawnable(struct Map* map, int x, int y, Direction dir, uint8_t len
             }
             break;
         case DOWN:
+            y += SNAKE_HEAD_EMPTY_OVERHEAD; //shift the head down to make space for the head
             if (y + length >= MAP_HEIGHT) return false;
             if (y - length < 0) return false;
             for (int i = 0; i < length; i++) {
@@ -47,6 +49,7 @@ bool Snake_IsSpawnable(struct Map* map, int x, int y, Direction dir, uint8_t len
             }
             break;
         case LEFT:
+            x -= SNAKE_HEAD_EMPTY_OVERHEAD; //shift the head left to make space for the head
             if (x - length < 0) return false;
             if (x + length >= MAP_WIDTH) return false;
             for (int i = 0; i < length; i++) {
@@ -54,6 +57,7 @@ bool Snake_IsSpawnable(struct Map* map, int x, int y, Direction dir, uint8_t len
             }
             break;
         case RIGHT:
+            x += SNAKE_HEAD_EMPTY_OVERHEAD; //shift the head right to make space for the head
             if (x + length >= MAP_WIDTH) return false;
             if (x - length < 0) return false;
             for (int i = 0; i < length; i++) {
