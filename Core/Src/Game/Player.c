@@ -29,9 +29,10 @@ struct Player Player(){
     // return player;
 }
 
-
-void Player_SetDirection(struct Player* player, Direction dir) {
-    player->buttonPressed[dir] = true;
+void Player_SetDirection(struct Player* player, Direction dir, bool value) {
+//void Player_SetDirection(struct Player* player, Direction dir, bool value) {
+	//player->buttonPressed[dir] = true;
+    player->buttonPressed[dir] = value;
 }
 
 bool Is_Alive(struct Player* player) {

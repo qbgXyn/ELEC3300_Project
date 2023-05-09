@@ -18,12 +18,16 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "fatfs.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "lcd.h"
 #include "stdbool.h"
 #include "stdio.h"
+#include "ff.h"
+#include "ff_gen_drv.h"
+#include "sd_diskio.h"
 #include "Game/Blob.h"
 #include "Game/Player.h"
 #include "Game/Snake.h"
@@ -51,9 +55,15 @@
 /* Private variables ---------------------------------------------------------*/
  CRC_HandleTypeDef hcrc;
 
+SD_HandleTypeDef hsd;
+
 TIM_HandleTypeDef htim2;
 
 SRAM_HandleTypeDef hsram1;
+
+extern FATFS SDFatFS;
+extern FIL SDFile;
+extern char SDPath[4];
 
 /* USER CODE BEGIN PV */
 //uint32_t game_time = 0;
@@ -65,9 +75,25 @@ static void MX_GPIO_Init(void);
 static void MX_FSMC_Init(void);
 static void MX_CRC_Init(void);
 static void MX_TIM2_Init(void);
+static void MX_SDIO_SD_Init(void);
 /* USER CODE BEGIN PFP */
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim);
+FRESULT init_mount_sd(void) {
+	FRESULT res;
+
+	if(FATFS_LinkDriver(&SD_Driver, SDPath) != 0) {
+		return FR_INVALID_DRIVE;
+	}
+
+	res = f_mount(&SDFatFS, SDPath, 1);
+	if (res != FR_OK){
+		FATFS_UnLinkDriver(SDPath);
+		return res;
+	}
+
+	return FR_OK;
+}
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -129,12 +155,23 @@ int main(void)
   MX_FSMC_Init();
   MX_CRC_Init();
   MX_TIM2_Init();
+  MX_SDIO_SD_Init();
+  MX_FATFS_Init();
+  // Initialize SD card and mount file system
+   if (init_mount_sd() != FR_OK) {
+     // Handle error (e.g., display an error message)
+   }
   /* USER CODE BEGIN 2 */
     LCD_INIT();
     //HAL_TIM_Base_Start_IT(&htim2);
     game = Game();
     MENU_SwitchMenu(MAIN_MENU);
-    
+    // Load map data, dummy
+      char map_buffer[60]; // Originally MAP_BUFFER_SIZE as parameter, = 60
+      /**
+      if (LoadFileMap("mapfile.bin", map_buffer) != FR_OK) { //Originally MAP_BUFFER_SIZE as parameter, = 60
+        // Handle error (e.g., display an error message)
+      }*/
     // these lines of code is copied from K2
     // to simulate the game start
     // since debug cannot track interrupt
@@ -153,19 +190,52 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    if (game->is_running) {   // 
-        if (update_game_flag) { // update_game_flag == 1, updates every half a second, same effect as Hal_Delay(1000/TICK), where TICK = 2
-    		  Game_Update(game);
-    		  Game_Render(game);
-    		  //HAL_Delay(1000/TICK); // simulation only, should be replaced by timer to run code and update game
-          ++food_counter;
-          update_game_flag = 0;
-    	}
-      if (food_counter*(1000/TICK) >= game->food_spawn_interval) { // change to the unit into ms
-          Spawn_Food_Randomly(game->map);
-          food_counter = 0;
-      }
-    }
+		if (game->is_running) {   //
+			if (update_game_flag) { // update_game_flag == 1, updates every half a second, same effect as Hal_Delay(1000/TICK), where TICK = 2
+				Game_Update(game);
+				Game_Render(game);
+				//HAL_Delay(1000/TICK); // simulation only, should be replaced by timer to run code and update game
+				++food_counter;
+				update_game_flag = 0;
+				//game->player_self->buttonPressed[0] = false;
+				//game->player_self->buttonPressed[1] = false;
+				//game->player_self->buttonPressed[2] = false;
+				//game->player_self->buttonPressed[3] = false;
+				Player_SetDirection(&game->player_self, UP, false);
+				Player_SetDirection(&game->player_self, LEFT, false);
+				Player_SetDirection(&game->player_self, DOWN, false);
+				Player_SetDirection(&game->player_self, RIGHT, false);
+			}
+			if (food_counter * (1000 / TICK) >= game->food_spawn_interval) { // change to the unit into ms
+				Spawn_Food_Randomly(game->map);
+				food_counter = 0;
+			}
+			if (HAL_GPIO_ReadPin(GPIOB, Up_Pin) == GPIO_PIN_RESET) {
+				//HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
+				//game->player_self->
+				//Player_SetDirection(&game->player_self, UP);
+				Player_SetDirection(&game->player_self, UP, true);
+			}
+			else if (HAL_GPIO_ReadPin(GPIOB, Left_Pin) == GPIO_PIN_RESET) {
+				//Player_SetDirection(&game->player_self, LEFT);
+				Player_SetDirection(&game->player_self, LEFT, true);
+			}
+			else if (HAL_GPIO_ReadPin(GPIOB, Down_Pin) == GPIO_PIN_RESET) {
+				//Player_SetDirection(&game->player_self, DOWN);
+				Player_SetDirection(&game->player_self, DOWN, true);
+			}
+			else if (HAL_GPIO_ReadPin(GPIOB, Right_Pin) == GPIO_PIN_RESET) {
+				//Player_SetDirection(&game->player_self, RIGHT);
+				Player_SetDirection(&game->player_self, RIGHT, true);
+			}
+
+			//Player_SetDirection(&game->player_self, UP, false);
+			//Player_SetDirection(&game->player_self, LEFT, false);
+			//Player_SetDirection(&game->player_self, DOWN, false);
+			//Player_SetDirection(&game->player_self, RIGHT, false);
+		}
+
+
     // test code for cannot launch second game
     // if (i == 5) {
     //     Game_End(game);
@@ -248,6 +318,34 @@ static void MX_CRC_Init(void)
 }
 
 /**
+  * @brief SDIO Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_SDIO_SD_Init(void)
+{
+
+  /* USER CODE BEGIN SDIO_Init 0 */
+
+  /* USER CODE END SDIO_Init 0 */
+
+  /* USER CODE BEGIN SDIO_Init 1 */
+
+  /* USER CODE END SDIO_Init 1 */
+  hsd.Instance = SDIO;
+  hsd.Init.ClockEdge = SDIO_CLOCK_EDGE_RISING;
+  hsd.Init.ClockBypass = SDIO_CLOCK_BYPASS_DISABLE;
+  hsd.Init.ClockPowerSave = SDIO_CLOCK_POWER_SAVE_DISABLE;
+  hsd.Init.BusWide = SDIO_BUS_WIDE_1B;
+  hsd.Init.HardwareFlowControl = SDIO_HARDWARE_FLOW_CONTROL_DISABLE;
+  hsd.Init.ClockDiv = 1;
+  /* USER CODE BEGIN SDIO_Init 2 */
+
+  /* USER CODE END SDIO_Init 2 */
+
+}
+
+/**
   * @brief TIM2 Initialization Function
   * @param None
   * @retval None
@@ -318,10 +416,14 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOE_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(LCD_BL_GPIO_Port, LCD_BL_Pin, GPIO_PIN_SET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(LCD_RST_GPIO_Port, LCD_RST_Pin, GPIO_PIN_SET);
@@ -338,12 +440,25 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(K1_GPIO_Port, &GPIO_InitStruct);
 
+  /*Configure GPIO pins : Up_Pin Left_Pin Down_Pin Right_Pin */
+  GPIO_InitStruct.Pin = Up_Pin|Left_Pin|Down_Pin|Right_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
   /*Configure GPIO pin : LCD_BL_Pin */
   GPIO_InitStruct.Pin = LCD_BL_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
   HAL_GPIO_Init(LCD_BL_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : PB5 */
+  GPIO_InitStruct.Pin = GPIO_PIN_5;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /*Configure GPIO pin : LCD_RST_Pin */
   GPIO_InitStruct.Pin = LCD_RST_Pin;

@@ -10,7 +10,7 @@
 #include "GUI/menu.h"
 #include "lcd.h"
 #include "GUI/game_gui.h"
-
+#include "ff.h"
 
 extern TIM_HandleTypeDef htim2;	// the timer TIM2, initialized by HAL_TIM_Base_Start_IT(&htim2) in Game_Start()
 uint32_t game_time = 0;	// game_time, for testing
@@ -195,6 +195,7 @@ void Game_End(struct Game* game) {
 // 222
 // 000
 // return true if success, false if fail
+/**
 bool LoadFileMap(struct Game* game, char* map_name) {
     FILE* file = fopen(map_name, "r");
     if (file == NULL) {
@@ -221,6 +222,48 @@ bool LoadFileMap(struct Game* game, char* map_name) {
     }
     fclose(file);
     return true;
+}
+*/
+FRESULT LoadFileMap(struct Game* game, char* map_name) {
+    FIL file;
+    FRESULT res = f_open(&file, map_name, FA_READ);
+    if (res != FR_OK) {
+        return res;
+    }
+
+    char buffer[32];
+    UINT bytesRead;
+
+    f_gets(buffer, sizeof(buffer), &file);
+    sscanf(buffer,"%d", &game->food_spawn_interval);
+
+    int bg;
+    f_gets(buffer, sizeof(buffer), &file);
+    sscanf(buffer, "%d", &bg);
+
+    if((bg > BG_COUNTER && bg != BG_CUSTOM) || bg < 0) {
+        f_close(&file);
+        return FR_INVALID_PARAMETER;
+    }
+
+    if(game->map != NULL) {
+        Map_Delete(game->map);
+    }
+
+    game->map = Map(MAP_WIDTH, MAP_HEIGHT);
+    game->map->map_bg = bg;
+
+    for(int x = 0; x < MAP_WIDTH; x++) {
+        for(int y = 0; y < MAP_HEIGHT; y++) {
+            int data;
+            f_gets(buffer, sizeof(buffer), &file);
+            sscanf(buffer, "%d", &data);
+            LoadDataToMap(game, x, y, data);
+        }
+    }
+
+    f_close(&file);
+    return FR_OK;
 }
 
 

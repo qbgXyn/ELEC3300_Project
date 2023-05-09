@@ -24,8 +24,8 @@ struct Player {
 
 struct Player Player();
 
-
-void Player_SetDirection(struct Player* player, Direction dir);
+void Player_SetDirection(struct Player* player, Direction dir, bool value);
+//void Player_SetDirection(struct Player* player, Direction dir, bool value);
 
 void Signal_Receive(struct Player* player, Direction dir);
 

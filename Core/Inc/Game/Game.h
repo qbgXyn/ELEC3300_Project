@@ -4,9 +4,12 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdio.h>
 #include "Game/Player.h"
 #include "Game/Game_Data.h"
 #include "GUI/bg.h"
+#include "ff.h"
+
 
 
 
@@ -53,7 +56,7 @@ bool Game_IsHost(struct Game* game);
 void Game_SetHost(struct Game* game, bool is_host);
 
 
-bool LoadFileMap(struct Game* game, char* map_name);
+FRESULT LoadFileMap(struct Game* game, char* map_name);
 void LoadRandomMap(struct Game* game, int stone_rate);
 bool LoadInternalMap(struct Game* game, char* map_name);
 void Game_SetMap(struct Game* game);
