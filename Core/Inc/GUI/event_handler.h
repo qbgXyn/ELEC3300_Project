@@ -4,7 +4,9 @@
 
 void handle_map_selection();
 
-void handle_BTN_pressed_InGame();
+void handle_K1_pressed_InGame();
+
+void handle_K2_pressed_InGame();
 
 void handle_K2_pressed_EndGame();
 

@@ -30,6 +30,7 @@
 #include "Game/Game.h"
 #include "GUI/event_handler.h"
 #include <string.h>
+#include <stdbool.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -58,6 +59,8 @@ extern MenuState menuState;
 
 
 extern struct Game* game;
+
+bool exitMenuDisplayed = false;
 
 /* USER CODE END PV */
 
@@ -232,7 +235,7 @@ void EXTI0_IRQHandler(void)
 	  }
 
 	  if (menuState == IN_GAME) {
-	    handle_BTN_pressed_InGame();
+	    handle_K1_pressed_InGame();
 	  }
 
 	  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
@@ -265,7 +268,7 @@ void EXTI15_10_IRQHandler(void)
   /* USER CODE END EXTI15_10_IRQn 0 */
 	switch (menuState) {
 	    case IN_GAME:
-	          handle_BTN_pressed_InGame();
+	          handle_K2_pressed_InGame();
 	          break;
 	    case END_GAME:
 	          handle_K2_pressed_EndGame();

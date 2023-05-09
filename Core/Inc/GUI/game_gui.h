@@ -13,7 +13,9 @@
 #include <stdbool.h>
 
 void ShowExitConfirmation();
+void ShowEndGameMessage(int end_game_status);
 
 char* GetEndGameMessage(int end_game_status);
+void ClearPromptBox();
 
 #endif

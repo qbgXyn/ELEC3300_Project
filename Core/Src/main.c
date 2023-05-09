@@ -190,27 +190,24 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-		if (game->is_running) {   //
-			if (update_game_flag) { // update_game_flag == 1, updates every half a second, same effect as Hal_Delay(1000/TICK), where TICK = 2
-				Game_Update(game);
-				Game_Render(game);
-				//HAL_Delay(1000/TICK); // simulation only, should be replaced by timer to run code and update game
-				++food_counter;
-				update_game_flag = 0;
-				//game->player_self->buttonPressed[0] = false;
-				//game->player_self->buttonPressed[1] = false;
-				//game->player_self->buttonPressed[2] = false;
-				//game->player_self->buttonPressed[3] = false;
-				Player_SetDirection(&game->player_self, UP, false);
-				Player_SetDirection(&game->player_self, LEFT, false);
-				Player_SetDirection(&game->player_self, DOWN, false);
-				Player_SetDirection(&game->player_self, RIGHT, false);
-			}
-			if (food_counter * (1000 / TICK) >= game->food_spawn_interval) { // change to the unit into ms
-				Spawn_Food_Randomly(game->map);
-				food_counter = 0;
-			}
-			if (HAL_GPIO_ReadPin(GPIOB, Up_Pin) == GPIO_PIN_RESET) {
+    if (game->is_running) {   // 
+        if (update_game_flag) { // update_game_flag == 1, updates every half a second, same effect as Hal_Delay(1000/TICK), where TICK = 2
+          Player_AddScore(&game->player_self, SCORE_PER_TICK);
+    		  Game_Update(game);
+    		  Game_Render(game);
+    		  //HAL_Delay(1000/TICK); // simulation only, should be replaced by timer to run code and update game
+          ++food_counter;
+          update_game_flag = 0;
+          Player_SetDirection(&game->player_self, UP, false);
+				  Player_SetDirection(&game->player_self, LEFT, false);
+				  Player_SetDirection(&game->player_self, DOWN, false);
+				  Player_SetDirection(&game->player_self, RIGHT, false);
+    	}
+      if (food_counter*(1000/TICK) >= game->food_spawn_interval) { // change to the unit into ms
+          Spawn_Food_Randomly(game->map);
+          food_counter = 0;
+      }
+      if (HAL_GPIO_ReadPin(GPIOB, Up_Pin) == GPIO_PIN_RESET) {
 				//HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
 				//game->player_self->
 				//Player_SetDirection(&game->player_self, UP);
@@ -228,14 +225,7 @@ int main(void)
 				//Player_SetDirection(&game->player_self, RIGHT);
 				Player_SetDirection(&game->player_self, RIGHT, true);
 			}
-
-			//Player_SetDirection(&game->player_self, UP, false);
-			//Player_SetDirection(&game->player_self, LEFT, false);
-			//Player_SetDirection(&game->player_self, DOWN, false);
-			//Player_SetDirection(&game->player_self, RIGHT, false);
-		}
-
-
+    }
     // test code for cannot launch second game
     // if (i == 5) {
     //     Game_End(game);

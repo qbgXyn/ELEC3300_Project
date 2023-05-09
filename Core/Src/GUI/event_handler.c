@@ -16,32 +16,34 @@ extern MenuState menuState;
 
 extern struct Game* game;
 
+extern bool exitMenuDisplayed;
+
 void handle_map_selection() {
   strcpy(game->map_name, menuItemNameList[currentMenuItemIndex]);
 }
 
-void handle_BTN_pressed_InGame() {
-    Game_Pause(game);
-    ShowExitConfirmation();
-    int8_t btn;
-    while (1) {
-        if (HAL_GPIO_ReadPin(K1_GPIO_Port, K1_Pin) == GPIO_PIN_SET) {
-            btn = BTN_K1;
-            break;
-        }
-        if (HAL_GPIO_ReadPin(K2_GPIO_Port, K2_Pin) == GPIO_PIN_SET) {
-            btn = BTN_K2;
-            break;
-        }
+void handle_K1_pressed_InGame() {
+    if (exitMenuDisplayed == false) {
+        exitMenuDisplayed = true;
+        Game_Pause(game);
+        ShowExitConfirmation();
+    }else {
+        ClearPromptBox();
+        Game_Resume(game);
+        exitMenuDisplayed = false;
     }
-    
-    if (btn == BTN_K2) {
+}
+
+void handle_K2_pressed_InGame() {
+    if (exitMenuDisplayed == false) {
+        exitMenuDisplayed = true;
+        Game_Pause(game);
+        ShowExitConfirmation();
+    }else {
         Game_End(game);
         MENU_SetState(MAIN_MENU);
         MENU_SwitchMenu(menuState);
-    }else if (btn == BTN_K1){
-        ClearPromptBox();
-        Game_Resume(game);
+        exitMenuDisplayed = false;
     }
 }
 

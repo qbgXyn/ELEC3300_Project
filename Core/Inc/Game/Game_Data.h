@@ -11,6 +11,8 @@
 #define PLAYER_1_ID 0
 #define PLAYER_2_ID 1
 #define PLAYER_UNKNOWN_ID -1
+#define SCORE_PER_TICK 1
+#define SCORE_PER_FOOD 10
 
 #define NAME_LENGTH 32
 

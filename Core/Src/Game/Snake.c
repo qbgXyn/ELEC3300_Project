@@ -75,7 +75,7 @@ bool Snake_IsSpawnable(struct Map* map, int x, int y, Direction dir, uint8_t len
 // if the snake is not dead, check if the snake eats food
 // move the snake by create a new head
 // if the snake eats food, do not delete the tail(that way, the length grows by 1). if not, delete the tail
-void Snake_Update(struct Player* player, struct Map* map, struct Snake* snake) {
+bool Snake_Update(struct Player* player, struct Map* map, struct Snake* snake) {
     struct Blob* head = snake->head;
     int x = head->x;
     int y = head->y;
@@ -84,12 +84,12 @@ void Snake_Update(struct Player* player, struct Map* map, struct Snake* snake) {
     Snake_GetNextBodyPosition(head, &x, &y);
     if (x < 0 || x >= MAP_WIDTH || y < 0 || y >= MAP_HEIGHT) {
         Snake_Delete(player, map, snake);
-        return;
+        return false;
     }
     if (Is_Empty(map, x, y) == false) {
         if (Is_Stone(map, x, y) || Is_Body(map, x, y)) {
             Snake_Delete(player, map, snake);
-            return;
+            return false;
         }
         if(Is_Food(map, x, y)) {
             ClearCell(map, x, y);
@@ -103,6 +103,7 @@ void Snake_Update(struct Player* player, struct Map* map, struct Snake* snake) {
     if (eat == false) {
         Snake_Remove_Tail(map, snake);
     }
+    return eat;
 }
 
 // get the previous position of the snake head
