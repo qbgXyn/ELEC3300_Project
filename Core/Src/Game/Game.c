@@ -200,35 +200,6 @@ void Game_End(struct Game* game) {
 // 222
 // 000
 // return true if success, false if fail
-/**
-bool LoadFileMap(struct Game* game, char* map_name) {
-    FILE* file = fopen(map_name, "r");
-    if (file == NULL) {
-        return false;
-    }
-    fscanf(file, "%d", &game->food_spawn_interval);
-    int bg;
-    fscanf(file, "%d", &bg);
-    if ((bg > BG_COUNTER && bg != BG_CUSTOM) || bg < 0) {
-        fclose(file);
-        return false;
-    }
-    if (game->map != NULL) {
-        Map_Delete(game->map);
-    }
-    game->map = Map(MAP_WIDTH, MAP_HEIGHT);
-    game->map->map_bg = bg;
-    for(int x = 0; x < MAP_WIDTH; x++) {
-        for(int y = 0; y < MAP_HEIGHT; y++) {
-            int data;
-            fscanf(file, "%d", &data);
-            LoadDataToMap(game, x, y, data);
-        }
-    }
-    fclose(file);
-    return true;
-}
-*/
 FRESULT LoadFileMap(struct Game* game, char* map_name) {
     FIL file;
     FRESULT res = f_open(&file, map_name, FA_READ);
@@ -301,6 +272,7 @@ bool LoadInternalMap(struct Game* game, char* map_name) {
                 LoadDataToMap(game, x, y, INTERNAL_MAP_CLASSIC[x][y]);
             }
         }
+        game->food_spawn_interval = DEFAULT_FOOD_SPAWN_INTERVAL;
         return true;
     }
     // temp ugly code
@@ -349,6 +321,7 @@ void LoadRandomMap(struct Game* game, int stone_rate) {
     }
     // set background
     game->map->map_bg = BG_RANDOM;
+    game->food_spawn_interval = DEFAULT_FOOD_SPAWN_INTERVAL;
 }
 
 // set up the map based on name
