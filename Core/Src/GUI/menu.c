@@ -142,7 +142,8 @@ void MENU_SwitchMenu(MenuState newMenuState) {
 void MENU_DrawScoreBoard(struct Game* game) {
     // Show player score
     char scoreBuffer[32];
-    snprintf(scoreBuffer, sizeof(scoreBuffer), "Score: %d", Player_GetScore(&game->player_self));
+    snprintf(scoreBuffer, sizeof(scoreBuffer), "Score: %d", Player_GetScore(&game
+    		->player_self));
     LCD_DrawString(10, 2, scoreBuffer);
 
     if (Game_GetPlayerCount(game) == 2) {
