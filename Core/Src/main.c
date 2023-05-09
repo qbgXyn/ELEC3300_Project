@@ -155,6 +155,7 @@ int main(void)
   {
     if (game->is_running) {   // 
         if (update_game_flag) { // update_game_flag == 1, updates every half a second, same effect as Hal_Delay(1000/TICK), where TICK = 2
+          Player_AddScore(&game->player_self, SCORE_PER_TICK);
     		  Game_Update(game);
     		  Game_Render(game);
     		  //HAL_Delay(1000/TICK); // simulation only, should be replaced by timer to run code and update game

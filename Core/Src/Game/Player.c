@@ -46,7 +46,9 @@ void Player_Update(struct Map* map, struct Player* player) {
             Snake_SetDirection(player->snake, i);
         }
     }
-    Snake_Update(player, map, player->snake);
+    if (Snake_Update(player, map, player->snake)) {
+        Player_AddScore(player, SCORE_PER_FOOD);
+    }
     if (player->snake == NULL) {
         player->is_alive = false;
     }

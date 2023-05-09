@@ -17,6 +17,7 @@ uint32_t game_time = 0;	// game_time, for testing
 uint8_t update_game_flag = 0;   // used in main.c
 uint8_t food_counter = 0;
 extern struct Game* game;
+extern int highScore;
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {	// Function for updating variables whenever timer ticks
     if (htim->Instance == TIM2) {	// basically, whenever the timer ticks
@@ -110,6 +111,7 @@ void Game_Render(struct Game* game) {
             }
         }
     }
+    MENU_DrawScoreBoard(game);
 }  
 
 
@@ -123,11 +125,11 @@ void Game_Start(struct Game* game) {
     // Draw the background according to the type of map chosen by the player
     game->map->map_bg = Game_GetMapBgType(game); // if map is Random, fix the background to certain type
     BG_DrawBackground(BG_GetBackGround(game->map->map_bg));
-    MENU_DrawScoreBoard(game);
 
     game->player_self.is_alive = true;
     game->player_self.score = 0;
     game->player_other.score = 0;
+    MENU_DrawScoreBoard(game);
 
     // generate all players and add them to the map
     if (game->game_mode == SINGLE_PLAYER) {
@@ -163,6 +165,9 @@ void Game_End(struct Game* game) {
     Player_Delete(game->map, &game->player_other);
     Map_Delete(game->map);
     game->map = NULL;
+    if (game->player_self.score - 1 > highScore) {
+        highScore = game->player_self.score -1 ;
+    }
 }
 
 //clear all neurtal stuff such as food and stone  by calling clearmap

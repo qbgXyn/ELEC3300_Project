@@ -17,8 +17,6 @@ extern MenuState menuState;
 extern struct Game* game;
 
 extern bool exitMenuDisplayed;
-extern bool K1Pressed;
-extern bool K2Pressed;
 
 void handle_map_selection() {
   strcpy(game->map_name, menuItemNameList[currentMenuItemIndex]);

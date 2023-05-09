@@ -61,8 +61,6 @@ extern MenuState menuState;
 extern struct Game* game;
 
 bool exitMenuDisplayed = false;
-bool K1Pressed = false;
-bool K2Pressed = false;
 
 /* USER CODE END PV */
 

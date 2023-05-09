@@ -38,4 +38,7 @@ int Player_Getid(struct Game* game);
 bool Player_Spawn(struct Game* game, struct Player* player, int x, int y, Direction dir);
 void Player_SpawnRandom(struct Game* game, struct Map* map, struct Player* player);
 
+void Player_AddScore(struct Player* player, int score);
+int Player_GetScore(struct Player* player);
+
 #endif

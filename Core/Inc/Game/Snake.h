@@ -20,7 +20,7 @@ struct Snake {
 struct Snake* Snake(struct Map* map, uint8_t player_id, int x, int y, Direction dir, uint8_t length);
 
 
-void Snake_Update(struct Player* player, struct Map* map, struct Snake* snake);
+bool Snake_Update(struct Player* player, struct Map* map, struct Snake* snake);
 void Snake_Grow(struct Map* map, struct Snake* snake);
 void Snake_Delete(struct Player* player, struct Map* map, struct Snake* snake);
 
