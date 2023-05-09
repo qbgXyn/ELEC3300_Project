@@ -15,9 +15,9 @@
 
 typedef enum {SINGLE_PLAYER, MULTI_PLAYER} GameMode;
 
-#define STONE_RATE_EASY 40
-#define STONE_RATE_MEDIUM 30
-#define STONE_RATE_HARD 20
+#define STONE_RATE_EASY 35
+#define STONE_RATE_MEDIUM 20
+#define STONE_RATE_HARD 10
 
 
 struct Map;
